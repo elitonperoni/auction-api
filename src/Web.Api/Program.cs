@@ -2,6 +2,7 @@ using System.Reflection;
 using Application;
 using HealthChecks.UI.Client;
 using Infrastructure;
+using Infrastructure.Hubs;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using Web.Api;
@@ -20,6 +21,8 @@ builder.Services
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
+builder.Services.AddSignalR();
+
 WebApplication app = builder.Build();
 
 app.MapEndpoints();
@@ -36,6 +39,12 @@ app.MapHealthChecks("health", new HealthCheckOptions
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true) 
+    .AllowCredentials());
+
 app.UseRequestContextLogging();
 
 app.UseSerilogRequestLogging();
@@ -45,8 +54,9 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 
 app.UseAuthorization();
+        
+app.MapHub<AuctionHub>("/auctionHub");
 
-// REMARK: If you want to use Controllers, you'll need this.
 app.MapControllers();
 
 await app.RunAsync();
