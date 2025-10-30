@@ -1,46 +1,48 @@
 ﻿using Application.Abstractions.Messaging;
+using Application.AuctionBid.Create;
 using Application.Todos.Create;
-using Domain.Todos;
 using Infrastructure.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Todos;
+namespace Web.Api.Endpoints.AuctionBid;
 
 internal sealed class Create : IEndpoint
 {
     public sealed class Request
     {
         public Guid UserId { get; set; }
-        public string Description { get; set; }
-        public DateTime? DueDate { get; set; }
-        public List<string> Labels { get; set; } = [];
-        public int Priority { get; set; }
+        public decimal Value { get; set; }
     }
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("todos", async (
+        app.MapPost("send", async (
             Request request,
-            ICommandHandler<CreateTodoCommand, Guid> handler,            
+            ICommandHandler<CreateAuctionBidCommand, Guid> handler,
+            IHubContext<AuctionHub> hubContext,
             CancellationToken cancellationToken) =>
         {
-            var command = new CreateTodoCommand
+            var command = new CreateAuctionBidCommand
             {
                 UserId = request.UserId,
-                Description = request.Description,
-                DueDate = request.DueDate,
-                Labels = request.Labels,
-                Priority = (Priority)request.Priority
+                Value = request.Value
             };
 
             Result<Guid> result = await handler.Handle(command, cancellationToken);
 
+            await hubContext.Clients.All.SendAsync("NovoLance", new
+            {
+                UserId = Guid.NewGuid(),
+                Value = 8500
+            }, cancellationToken);
+
+
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Todos)
-        .RequireAuthorization();
+        .WithTags(Tags.AuctionBids);
+        //.RequireAuthorization();
     }
 }

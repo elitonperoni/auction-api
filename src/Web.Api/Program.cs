@@ -19,11 +19,23 @@ builder.Services
     .AddPresentation()
     .AddInfrastructure(builder.Configuration);
 
+
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 builder.Services.AddSignalR();
 
+builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
+    policy => policy
+        // Substitua pelas URLs REAIS do seu frontend
+        .WithOrigins("http://localhost:3000", "null")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials() 
+));
+
 WebApplication app = builder.Build();
+
+app.UseCors("CorsPolicy");
 
 app.MapEndpoints();
 
@@ -39,12 +51,6 @@ app.MapHealthChecks("health", new HealthCheckOptions
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
-app.UseCors(x => x
-    .AllowAnyMethod()
-    .AllowAnyHeader()
-    .SetIsOriginAllowed(origin => true) 
-    .AllowCredentials());
-
 app.UseRequestContextLogging();
 
 app.UseSerilogRequestLogging();
@@ -54,10 +60,10 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 
 app.UseAuthorization();
-        
-app.MapHub<AuctionHub>("/auctionHub");
 
 app.MapControllers();
+
+app.MapHub<AuctionHub>("/auctionHub");
 
 await app.RunAsync();
 
