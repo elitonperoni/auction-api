@@ -1,63 +1,102 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Security.Claims;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Hubs;
 
+
+// Assuma que você tem um serviço para interagir com o banco de dados/lógica de leilão
+// Exemplo: ILeilaoService
+[Authorize]
 public class AuctionHub : Hub
 {
-    public async Task EntrarNoGrupo(string nomeDoGrupo)
+    //private readonly ILeilaoService _leilaoService; // Serviço para obter dados do DB
+
+    //public AuctionHub(ILeilaoService leilaoService)
+    //{
+    //    _leilaoService = leilaoService;
+    //}
+
+    /// <summary>
+    /// Método chamado quando o cliente Next.js se conecta.
+    /// Ele deve chamar Clients.Group(productGroupName).SendAsync.
+    /// </summary>
+    /// <param name="groupName">O ID do produto (ex: "product_1") que o cliente está visualizando.</param>
+    public async Task JoinAuctionGroup(string groupName)
     {
-        // 1. Adiciona a conexão atual (Context.ConnectionId) ao grupo.
-        // O grupo é criado se ainda não existir.
-        await Groups.AddToGroupAsync(Context.ConnectionId, nomeDoGrupo);
+        // 1. Adiciona a conexão atual (o cliente) ao grupo específico do produto.
+        await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+        //_logger.LogInformation($"Cliente {Context.ConnectionId} adicionado ao grupo {productGroupName}");
 
-        // 2. Opcional: Notificar o usuário que ele entrou no grupo.
-        await Clients.Caller.SendAsync("Aviso", $"Você entrou no leilão: {nomeDoGrupo}");
-
-        // 3. Opcional: Notificar os outros membros do grupo que um novo usuário entrou.
-        // Clients.OthersInGroup(nomeDoGrupo) envia para todos no grupo, exceto o chamador.
-        await Clients.OthersInGroup(nomeDoGrupo).SendAsync("UsuarioEntrouNoGrupo", Context.ConnectionId, nomeDoGrupo);
+        // Opcional: Enviar uma mensagem de boas-vindas ou o estado atual do leilão
+        await Clients.Caller.SendAsync("ReceiveMessage", "AuctionHub", $"Você entrou no leilão: {groupName}");
     }
 
-    // Método que o cliente chamará para sair de um leilão/grupo
-    public async Task SairDoGrupo(string nomeDoGrupo)
+
+    /// <summary>
+    /// Recebe o novo lance do cliente Next.js (via invoke).
+    /// Assinatura do cliente Next.js: connection.invoke("SendBid", groupName, user, bidAmount.toString())
+    /// </summary>
+    /// <param name="productGroupName">O grupo/ID do produto (ex: "product_1").</param>
+    /// <param name="user">O ID ou nome do usuário que fez o lance.</param>
+    /// <param name="bidValueString">O valor do lance como string.</param>
+    public async Task SendBid(string productGroupName, string bidValueString)
     {
-        // 1. Remove a conexão atual do grupo.
-        // Se esta for a última conexão, o grupo é removido.
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, nomeDoGrupo);
+        string userId = Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        string userName = Context?.User?.Identity?.Name ?? "Licitante Desconhecido";
 
-        // 2. Opcional: Notificar o usuário que ele saiu do grupo.
-        await Clients.Caller.SendAsync("Aviso", $"Você saiu do leilão: {nomeDoGrupo}");
+        if (string.IsNullOrEmpty(userId))
+        {
+            await Clients.Caller.SendAsync("BidError", "Usuário não autenticado.");
+            return;
+        }
 
-        // 3. Opcional: Notificar os outros membros do grupo que um usuário saiu.
-        await Clients.OthersInGroup(nomeDoGrupo).SendAsync("UsuarioSaiuDoGrupo", Context.ConnectionId, nomeDoGrupo);
+        if (!decimal.TryParse(bidValueString, out decimal bidAmount))
+        {
+            await Clients.Caller.SendAsync("BidError", "Valor do lance inválido.");
+            return;
+        }
+
+        // --- 1. Lógica de Processamento do Lance (Simulação) ---
+        // Na vida real, você chamaria _leilaoService.ProcessBid(productGroupName, user, bidAmount);
+        int productId = int.Parse(productGroupName.Replace("product_", ""), System.Globalization.CultureInfo.InvariantCulture);
+        // Simulação de Obtenção de Dados Pós-Lance:
+        // Na realidade, esses valores viriam do seu serviço/banco de dados após um lance bem-sucedido.
+        decimal newCurrentBid = bidAmount;
+        int newTotalBids = 20 + 1;
+        string newBidderName = userName;
+        string newBidTime = DateTime.Now.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+        // --- 2. Broadcast para os Clientes Next.js ---
+
+        // CONTRATO: SendAsync("SendBid", receivedProductId, newBidAmount, newTotalBids, newBidderName, newBidTime)
+
+        await Clients.Group(productGroupName).SendAsync(
+            "SendBid",                 // Nome do método no cliente (newConnection.on("SendBid", ...))
+            productId,                 // 1. ID do Produto (number)
+            newCurrentBid,             // 2. Novo Valor do Lance (number)
+            newTotalBids,              // 3. Novo Total de Lances (number)
+            newBidderName,             // 4. Nome do Licitante (string)
+            newBidTime                 // 5. Tempo do Lance (string)
+        );
+
+        //_logger.LogInformation($"Lance de {newCurrentBid} enviado para o grupo {productGroupName} por {user}.");
     }
 
-    // Método que o cliente chamará para enviar uma mensagem/lance para um grupo específico
-    public async Task EnviarLanceParaGrupo(string nomeDoGrupo, string usuario, string lance)
-    {
-        // Envia a mensagem/lance PARA TODOS OS CLIENTES NESTE GRUPO.
-        // Use Clients.Group(nomeDoGrupo)
-        await Clients.Group(nomeDoGrupo).SendAsync("NovoLance", usuario, lance);
-    }
-
-    // O método EnviarMensagem original (agora obsoleto, a menos que você queira broadcast global)
-    public async Task EnviarMensagem(string usuario, string mensagem)
-    {
-        // Este método envia uma mensagem PARA TODOS OS CLIENTES (global broadcast)
-        await Clients.All.SendAsync("ReceberMensagem", usuario, mensagem);
-    }
-
-    // ... (Métodos OnConnectedAsync e OnDisconnectedAsync permanecem os mesmos) ...
-    public override async Task OnConnectedAsync()
-    {
-        await Clients.Others.SendAsync("UsuarioEntrou", Context.ConnectionId);
-        await base.OnConnectedAsync();
-    }
-
+    // Opcional: Remover do grupo quando o cliente desconectar (ou fechar a aba)
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await Clients.Others.SendAsync("UsuarioSaiu", Context.ConnectionId);
+        // A lógica de remoção do grupo pode ser mais complexa se houver muitos grupos
+        // Mas o ASP.NET Core geralmente gerencia a remoção automática na desconexão.
         await base.OnDisconnectedAsync(exception);
     }
+}
+
+// Interface de exemplo para o serviço de leilão
+public interface ILeilaoService
+{
+    Task<int> GetTotalBidsAsync(int productId);
+    // ... outros métodos ...
 }
