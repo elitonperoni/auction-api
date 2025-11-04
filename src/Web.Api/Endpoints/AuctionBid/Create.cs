@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.AuctionBid.Create;
+using Application.AuctionUseCases.SendBid;
 using Application.Todos.Create;
 using Infrastructure.Hubs;
 using Microsoft.AspNetCore.SignalR;
@@ -28,7 +28,7 @@ internal sealed class Create : IEndpoint
             var command = new CreateAuctionBidCommand
             {
                 UserId = request.UserId,
-                Value = request.Value
+                BidPrice = request.Value
             };
 
             Result<Guid> result = await handler.Handle(command, cancellationToken);

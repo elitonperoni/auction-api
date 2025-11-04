@@ -1,6 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Application.Abstractions.Messaging;
+using Application.AuctionUseCases.Create;
+using Application.AuctionUseCases.SendBid;
+using Application.Todos.Complete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -10,15 +14,16 @@ namespace Infrastructure.Hubs;
 
 // Assuma que você tem um serviço para interagir com o banco de dados/lógica de leilão
 // Exemplo: ILeilaoService
-[Authorize]
+//[Authorize]
 public class AuctionHub : Hub
 {
-    //private readonly ILeilaoService _leilaoService; // Serviço para obter dados do DB
+    private readonly ICommandHandler<CreateAuctionBidCommand, Guid> _handler;
 
-    //public AuctionHub(ILeilaoService leilaoService)
-    //{
-    //    _leilaoService = leilaoService;
-    //}
+    // O Handler é injetado, pois ele está na Camada de Aplicação
+    public AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler)
+    {
+        _handler = handler;
+    }
 
     /// <summary>
     /// Método chamado quando o cliente Next.js se conecta.
@@ -45,14 +50,14 @@ public class AuctionHub : Hub
     /// <param name="bidValueString">O valor do lance como string.</param>
     public async Task SendBid(string productGroupName, string bidValueString)
     {
-        string userId = Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
         string userName = Context?.User?.Identity?.Name ?? "Licitante Desconhecido";
 
-        if (string.IsNullOrEmpty(userId))
-        {
-            await Clients.Caller.SendAsync("BidError", "Usuário não autenticado.");
-            return;
-        }
+        //if (string.IsNullOrEmpty(userId))
+        //{
+        //    await Clients.Caller.SendAsync("BidError", "Usuário não autenticado.");
+        //    return;
+        //}
 
         if (!decimal.TryParse(bidValueString, out decimal bidAmount))
         {
@@ -62,7 +67,15 @@ public class AuctionHub : Hub
 
         // --- 1. Lógica de Processamento do Lance (Simulação) ---
         // Na vida real, você chamaria _leilaoService.ProcessBid(productGroupName, user, bidAmount);
-        int productId = int.Parse(productGroupName.Replace("product_", ""), System.Globalization.CultureInfo.InvariantCulture);
+        var productId = Guid.Parse(productGroupName.Replace("product_", ""), System.Globalization.CultureInfo.InvariantCulture);
+
+        await _handler.Handle(new CreateAuctionBidCommand
+        {
+            UserId = userId,
+            BidPrice = bidAmount,
+        }, CancellationToken.None);
+
+
         // Simulação de Obtenção de Dados Pós-Lance:
         // Na realidade, esses valores viriam do seu serviço/banco de dados após um lance bem-sucedido.
         decimal newCurrentBid = bidAmount;
@@ -83,6 +96,8 @@ public class AuctionHub : Hub
         );
 
         //_logger.LogInformation($"Lance de {newCurrentBid} enviado para o grupo {productGroupName} por {user}.");
+    
+    
     }
 
     // Opcional: Remover do grupo quando o cliente desconectar (ou fechar a aba)
@@ -92,11 +107,4 @@ public class AuctionHub : Hub
         // Mas o ASP.NET Core geralmente gerencia a remoção automática na desconexão.
         await base.OnDisconnectedAsync(exception);
     }
-}
-
-// Interface de exemplo para o serviço de leilão
-public interface ILeilaoService
-{
-    Task<int> GetTotalBidsAsync(int productId);
-    // ... outros métodos ...
 }

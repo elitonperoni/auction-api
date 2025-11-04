@@ -1,4 +1,6 @@
 ﻿using Application.Abstractions.Data;
+using Domain;
+using Domain.Auction;
 using Domain.Todos;
 using Domain.Users;
 using Infrastructure.DomainEvents;
@@ -15,6 +17,8 @@ public sealed class ApplicationDbContext(
     public DbSet<User> Users { get; set; }
 
     public DbSet<TodoItem> TodoItems { get; set; }
+    public DbSet<Auction> Auctions { get; set; }
+    public DbSet<Bid> Bids { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

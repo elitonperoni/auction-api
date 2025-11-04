@@ -8,14 +8,15 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Common.Interfaces;
 using Application.Todos.Complete;
+using Domain.Auction;
 using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
-namespace Application.AuctionBid.Create;
+namespace Application.AuctionUseCases.SendBid;
 
 public class CreateAuctionBidCommandHandler(
-    //IApplicationDbContext context,
+    IApplicationDbContext context
     //IDateTimeProvider dateTimeProvider,
     //IUserContext userContext
 )
@@ -23,7 +24,16 @@ public class CreateAuctionBidCommandHandler(
 {
     public async Task<Result<Guid>> Handle(CreateAuctionBidCommand command, CancellationToken cancellationToken)
     {
+        Bid auctionBid = new()
+        {
+            UserId = command.UserId,
+            AuctionId = command.AuctionId,
+            Amount = command.BidPrice,
+            BidDate = DateTime.UtcNow
+        };
 
-        return Result.Success(Guid.NewGuid());
+        await context.Bids.AddAsync(auctionBid, cancellationToken);
+
+        return Result.Success(auctionBid.Id);
     }
 }
