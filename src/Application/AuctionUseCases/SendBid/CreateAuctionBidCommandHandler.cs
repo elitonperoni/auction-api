@@ -33,6 +33,7 @@ public class CreateAuctionBidCommandHandler(
         };
 
         await context.Bids.AddAsync(auctionBid, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success(auctionBid.Id);
     }

@@ -45,12 +45,12 @@ public class AuctionHub : Hub
     /// Recebe o novo lance do cliente Next.js (via invoke).
     /// Assinatura do cliente Next.js: connection.invoke("SendBid", groupName, user, bidAmount.toString())
     /// </summary>
-    /// <param name="productGroupName">O grupo/ID do produto (ex: "product_1").</param>
+    /// <param name="auctionId">O grupo/ID do produto (ex: "product_1").</param>
     /// <param name="user">O ID ou nome do usuário que fez o lance.</param>
     /// <param name="bidValueString">O valor do lance como string.</param>
-    public async Task SendBid(string productGroupName, string bidValueString)
+    public async Task SendBid(Guid auctionId, string bidValueString)
     {
-        var userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+        //var userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
         string userName = Context?.User?.Identity?.Name ?? "Licitante Desconhecido";
 
         //if (string.IsNullOrEmpty(userId))
@@ -67,11 +67,12 @@ public class AuctionHub : Hub
 
         // --- 1. Lógica de Processamento do Lance (Simulação) ---
         // Na vida real, você chamaria _leilaoService.ProcessBid(productGroupName, user, bidAmount);
-        var productId = Guid.Parse(productGroupName.Replace("product_", ""), System.Globalization.CultureInfo.InvariantCulture);
+        
 
         await _handler.Handle(new CreateAuctionBidCommand
         {
-            UserId = userId,
+            AuctionId = Guid.Parse("863ca937-a969-4938-af92-11dd82303420"), //auctionId,
+            UserId = Guid.Parse("2c6be064-1db6-408a-a1ed-1583bf5dcac4"), //userId,
             BidPrice = bidAmount,
         }, CancellationToken.None);
 
@@ -80,18 +81,18 @@ public class AuctionHub : Hub
         // Na realidade, esses valores viriam do seu serviço/banco de dados após um lance bem-sucedido.
         decimal newCurrentBid = bidAmount;
         int newTotalBids = 20 + 1;
-        string newBidderName = userName;
+        //string newBidderName = userName;
         string newBidTime = DateTime.Now.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
         // --- 2. Broadcast para os Clientes Next.js ---
 
         // CONTRATO: SendAsync("SendBid", receivedProductId, newBidAmount, newTotalBids, newBidderName, newBidTime)
 
-        await Clients.Group(productGroupName).SendAsync(
-            "SendBid",                 // Nome do método no cliente (newConnection.on("SendBid", ...))
-            productId,                 // 1. ID do Produto (number)
+        await Clients.Group(auctionId.ToString()).SendAsync(
+            "ReceiveNewBid",                 // Nome do método no cliente (newConnection.on("SendBid", ...))
+            auctionId,                 // 1. ID do Produto (number)
             newCurrentBid,             // 2. Novo Valor do Lance (number)
             newTotalBids,              // 3. Novo Total de Lances (number)
-            newBidderName,             // 4. Nome do Licitante (string)
+            userName,             // 4. Nome do Licitante (string)
             newBidTime                 // 5. Tempo do Lance (string)
         );
 
