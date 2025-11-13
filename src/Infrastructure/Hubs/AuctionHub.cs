@@ -1,10 +1,13 @@
-﻿using System.Security.Claims;
+﻿using System.Globalization;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Application.Abstractions.Messaging;
 using Application.AuctionUseCases.Create;
 using Application.AuctionUseCases.SendBid;
+using Application.Extensions;
 using Application.Todos.Complete;
+using Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -25,8 +28,10 @@ public class AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler) 
     }
     public async Task SendBid(string groupName, string bidValueString)
     {
-        //var userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
-        string userName = Context?.User?.Identity?.Name ?? "Licitante Desconhecido";
+        //Guid userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+        string userName =  Context?.User?.Claims
+            .FirstOrDefault(c => c.Type == "name")?
+            .Value;
 
         //if (string.IsNullOrEmpty(userId))
         //{
@@ -42,14 +47,14 @@ public class AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler) 
         await handler.Handle(new CreateAuctionBidCommand
         {
             AuctionId = Guid.Parse(groupName), //auctionId,
-            UserId = Guid.Parse("52cdb602-8bf5-4f9f-8c93-c2b19a99a152"), //userId,
+            UserId = Guid.Parse("964d11f5-ced2-488f-bce2-d3e80e6c0693"), //userId,
             BidPrice = bidAmount,
         }, CancellationToken.None);
 
         decimal newCurrentBid = bidAmount;
         int newTotalBids = 20 + 1;
-        //string newBidderName = userName;
-        string newBidTime = DateTime.Now.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+
+        string newBidTime = DateTimeExtension.GetCurrentTime();
 
         await Clients.Group(groupName.ToString()).SendAsync(
             ChannelNames.ReceiveNewBid,
