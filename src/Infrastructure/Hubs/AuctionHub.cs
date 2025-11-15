@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Hubs;
 
-//[Authorize]
+[Authorize]
 public class AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler) : Hub
 {
     public async Task JoinAuctionGroup(string groupName)
@@ -31,7 +31,7 @@ public class AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler) 
         //Guid userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
         string userName =  Context?.User?.Claims
             .FirstOrDefault(c => c.Type == "name")?
-            .Value;
+            .Value ?? "Usuário anônimo";
 
         //if (string.IsNullOrEmpty(userId))
         //{
@@ -56,14 +56,27 @@ public class AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler) 
 
         string newBidTime = DateTimeExtension.GetCurrentTime();
 
-        await Clients.Group(groupName.ToString()).SendAsync(
+        //Notifiy Caller
+        await Clients.Caller.SendAsync(
+            ChannelNames.ReceiveNewBid,
+            groupName,
+            newCurrentBid,
+            newTotalBids,
+            userName,
+            newBidTime,
+            true
+        );
+
+        //Notify others
+        await Clients.GroupExcept(groupName.ToString(), Context!.ConnectionId).SendAsync(
             ChannelNames.ReceiveNewBid,
             groupName,                
             newCurrentBid,            
             newTotalBids,              
             userName,             
-            newBidTime                 
-        );    
+            newBidTime,
+            false
+        );        
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
