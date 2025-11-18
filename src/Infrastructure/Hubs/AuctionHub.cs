@@ -7,10 +7,12 @@ using Application.AuctionUseCases.Create;
 using Application.AuctionUseCases.SendBid;
 using Application.Extensions;
 using Application.Todos.Complete;
+using Domain.Users;
 using Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using SharedKernel;
 
 namespace Infrastructure.Hubs;
 
@@ -19,35 +21,50 @@ public class AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler) 
 {
     public async Task JoinAuctionGroup(string groupName)
     {
-        // 1. Adiciona a conexão atual (o cliente) ao grupo específico do produto.
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        //_logger.LogInformation($"Cliente {Context.ConnectionId} adicionado ao grupo {productGroupName}");
-
-        // Opcional: Enviar uma mensagem de boas-vindas ou o estado atual do leilão
         await Clients.Caller.SendAsync("ReceiveMessage", "AuctionHub", $"Você entrou no leilão: {groupName}");
     }
+
+    public async Task SyncAuctionState(string auctionId)
+    {
+        // 1. Buscar o estado ATUAL do banco (via serviço)
+        //Result<Guid> response = await handler.Handle(new CreateAuctionBidCommand
+        //{
+        //    AuctionId = Guid.Parse(auctionId),
+        //    UserId = Guid.Empty,
+        //    BidPrice = 0m,
+        //}, CancellationToken.None);
+
+        //if (response != null)
+        //{
+            // 2. Enviar o estado SÓ PARA O CLIENTE QUE PEDIU
+            await Clients.Caller.SendAsync("FullAuctionState", Guid.NewGuid().ToString());
+        //}
+    }
+
     public async Task SendBid(string groupName, string bidValueString)
     {
-        //Guid userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+        var userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
         string userName =  Context?.User?.Claims
             .FirstOrDefault(c => c.Type == "name")?
             .Value ?? "Usuário anônimo";
 
-        //if (string.IsNullOrEmpty(userId))
-        //{
-        //    await Clients.Caller.SendAsync("BidError", "Usuário não autenticado.");
-        //    return;
-        //}
+        if (userId == Guid.Empty)
+        {
+            await Clients.Caller.SendAsync("BidError", "Usuário não autenticado.");
+            return;
+        }
 
         if (!decimal.TryParse(bidValueString, out decimal bidAmount))
         {
             await Clients.Caller.SendAsync("BidError", "Valor do lance inválido.");
             return;
         }
+
         await handler.Handle(new CreateAuctionBidCommand
         {
-            AuctionId = Guid.Parse(groupName), //auctionId,
-            UserId = Guid.Parse("964d11f5-ced2-488f-bce2-d3e80e6c0693"), //userId,
+            AuctionId = Guid.Parse(groupName), 
+            UserId = userId,
             BidPrice = bidAmount,
         }, CancellationToken.None);
 
