@@ -16,6 +16,8 @@ builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configu
 
 builder.Services.AddSwaggerGenWithAuth();
 
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+
 builder.Services
     .AddApplication()
     .AddPresentation()
@@ -27,9 +29,8 @@ builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 builder.Services.AddSignalR();
 
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
-    policy => policy
-        // Substitua pelas URLs REAIS do seu frontend
-        .WithOrigins("http://localhost:3000", "null")
+    policy => policy        
+        .AllowAnyOrigin()
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
