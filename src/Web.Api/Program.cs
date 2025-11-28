@@ -29,8 +29,8 @@ builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 builder.Services.AddSignalR();
 
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
-    policy => policy        
-        .AllowAnyOrigin()
+    policy => policy
+        .WithOrigins("http://localhost:3000", "null")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
