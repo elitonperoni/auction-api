@@ -29,7 +29,7 @@ public static class DependencyInjection
         services
             .AddServices()
             .AddDatabase(configuration)
-            .AddHealthChecks(configuration)
+            //.AddHealthChecks(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal();
 
@@ -59,14 +59,14 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
-    {
-        services
-            .AddHealthChecks()
-            .AddNpgSql(configuration.GetConnectionString("Database")!);
+    //private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    //{
+    //    services
+    //        .AddHealthChecks()
+    //        .AddNpgSql(configuration.GetConnectionString("Database")!);
 
-        return services;
-    }
+    //    return services;
+    //}
 
     private static IServiceCollection AddAuthenticationInternal(
         this IServiceCollection services,
