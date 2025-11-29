@@ -4,10 +4,10 @@ using Application.Todos.Create;
 using Infrastructure.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using AuctionApi.Extensions;
+using AuctionApi.Infrastructure;
 
-namespace Web.Api.Endpoints.AuctionBid;
+namespace AuctionApi.Endpoints.AuctionBid;
 
 internal sealed class Create : IEndpoint
 {

@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Endpoints;
+﻿namespace AuctionApi.Endpoints;
 
 public static class Tags
 {

@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Extensions;
+﻿namespace AuctionApi.Extensions;
 
 public static class ApplicationBuilderExtensions
 {

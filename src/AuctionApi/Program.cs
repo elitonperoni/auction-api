@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using Web.Api;
-using Web.Api.Extensions;
+using AuctionApi;
+using AuctionApi.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -71,7 +71,7 @@ app.MapHub<AuctionHub>("/auctionHub");
 await app.RunAsync();
 
 // REMARK: Required for functional and integration tests to work.
-namespace Web.Api
+namespace AuctionApi
 {
     public partial class Program;
 }

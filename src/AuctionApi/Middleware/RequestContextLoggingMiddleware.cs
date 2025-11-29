@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Serilog.Context;
 
-namespace Web.Api.Middleware;
+namespace AuctionApi.Middleware;
 
 public class RequestContextLoggingMiddleware(RequestDelegate next)
 {

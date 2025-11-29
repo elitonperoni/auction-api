@@ -1,10 +1,10 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Users.GetById;
 using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using AuctionApi.Extensions;
+using AuctionApi.Infrastructure;
 
-namespace Web.Api.Endpoints.Users;
+namespace AuctionApi.Endpoints.Users;
 
 internal sealed class GetById : IEndpoint
 {

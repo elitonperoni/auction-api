@@ -4,10 +4,10 @@ using Domain.Todos;
 using Infrastructure.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using AuctionApi.Extensions;
+using AuctionApi.Infrastructure;
 
-namespace Web.Api.Endpoints.Todos;
+namespace AuctionApi.Endpoints.Todos;
 
 internal sealed class Create : IEndpoint
 {

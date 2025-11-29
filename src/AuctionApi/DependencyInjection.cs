@@ -1,6 +1,6 @@
-﻿using Web.Api.Infrastructure;
+﻿using AuctionApi.Infrastructure;
 
-namespace Web.Api;
+namespace AuctionApi;
 
 public static class DependencyInjection
 {
