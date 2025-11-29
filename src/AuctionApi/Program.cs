@@ -2,7 +2,10 @@ using System.Reflection;
 using Application;
 using HealthChecks.UI.Client;
 using Infrastructure;
+using Infrastructure.Hubs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Web.Api;
 using Web.Api.Extensions;
@@ -13,14 +16,29 @@ builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configu
 
 builder.Services.AddSwaggerGenWithAuth();
 
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+
 builder.Services
     .AddApplication()
     .AddPresentation()
     .AddInfrastructure(builder.Configuration);
 
+
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
+builder.Services.AddSignalR();
+
+builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
+    policy => policy
+        .WithOrigins("http://localhost:3000", "null")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials() 
+));
+
 WebApplication app = builder.Build();
+
+app.UseCors("CorsPolicy");
 
 app.MapEndpoints();
 
@@ -46,8 +64,9 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-// REMARK: If you want to use Controllers, you'll need this.
 app.MapControllers();
+
+app.MapHub<AuctionHub>("/auctionHub");
 
 await app.RunAsync();
 

@@ -1,6 +1,8 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Todos.Create;
 using Domain.Todos;
+using Infrastructure.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
@@ -22,7 +24,7 @@ internal sealed class Create : IEndpoint
     {
         app.MapPost("todos", async (
             Request request,
-            ICommandHandler<CreateTodoCommand, Guid> handler,
+            ICommandHandler<CreateTodoCommand, Guid> handler,            
             CancellationToken cancellationToken) =>
         {
             var command = new CreateTodoCommand
