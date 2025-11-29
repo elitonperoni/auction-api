@@ -1,34 +1,49 @@
-name: Build
+name: Deploy .NET 8 API to AWS Lambda
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
-
-env:
-  DOTNET_VERSION: "9.x"
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: '8.0.x'
 
-      - name: Restore
-        run: dotnet restore CleanArchitecture.sln
+      - name: Restore dependencies
+        # Você pode otimizar isso restaurando a solução inteira, se tiver uma
+        run: dotnet restore src/AuctionApi/AuctionApi.csproj
 
       - name: Build
-        run: dotnet build CleanArchitecture.sln --configuration Release --no-restore
+        run: dotnet build src/AuctionApi/AuctionApi.csproj --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test CleanArchitecture.sln --configuration Release --no-restore --no-build
+      - name: Publish Lambda package
+        run: dotnet publish src/AuctionApi/AuctionApi.csproj -c Release -o ./publish
 
-      - name: Publish
-        run: dotnet publish CleanArchitecture.sln --configuration Release --no-restore --no-build
+      # ✅ PASSO ADICIONADO AQUI
+      - name: Zip Lambda package
+        run: |
+          cd ./publish
+          zip -r ../deploy-package.zip .
+      
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to AWS Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name AuctionApi \
+            --zip-file fileb://deploy-package.zip
