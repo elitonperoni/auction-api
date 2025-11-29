@@ -1,6 +1,6 @@
-﻿using Web.Api.Middleware;
+﻿using AuctionApi.Middleware;
 
-namespace Web.Api.Extensions;
+namespace AuctionApi.Extensions;
 
 public static class MiddlewareExtensions
 {

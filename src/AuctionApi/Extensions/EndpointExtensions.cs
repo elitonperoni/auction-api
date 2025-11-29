@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Web.Api.Endpoints;
+using AuctionApi.Endpoints;
 
-namespace Web.Api.Extensions;
+namespace AuctionApi.Extensions;
 
 public static class EndpointExtensions
 {

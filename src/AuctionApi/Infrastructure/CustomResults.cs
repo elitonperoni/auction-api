@@ -1,6 +1,6 @@
 ﻿using SharedKernel;
 
-namespace Web.Api.Infrastructure;
+namespace AuctionApi.Infrastructure;
 
 public static class CustomResults
 {
