@@ -45,17 +45,17 @@ app.UseCors("CorsPolicy");
 
 app.MapEndpoints();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwaggerWithUi();
+app.UseSwaggerWithUi();
 
+if (app.Environment.IsDevelopment())
+{    
     app.ApplyMigrations();
 }
 
-app.MapHealthChecks("health", new HealthCheckOptions
-{
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+//app.MapHealthChecks("health", new HealthCheckOptions
+//{
+//    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+//});
 
 app.UseRequestContextLogging();
 
