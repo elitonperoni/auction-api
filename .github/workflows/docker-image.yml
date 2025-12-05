@@ -46,4 +46,4 @@ jobs:
  #         docker rmi ghcr.io/elitonperoni/auction-api/auction-api:latest || true                  
           
           # Suba o container com a nova imagem
-          docker compose up -d
+#          docker compose up -d
