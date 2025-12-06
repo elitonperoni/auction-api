@@ -12,14 +12,12 @@ using AuctionApi.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+//builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 builder.Configuration
     .AddEnvironmentVariables();
 
 builder.Services.AddSwaggerGenWithAuth();
-
-builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 
 builder.Services
     .AddApplication()
@@ -59,9 +57,9 @@ if (app.Environment.IsDevelopment())
 //    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 //});
 
-app.UseRequestContextLogging();
+//app.UseRequestContextLogging();
 
-app.UseSerilogRequestLogging();
+//app.UseSerilogRequestLogging();
 
 app.UseExceptionHandler();
 
