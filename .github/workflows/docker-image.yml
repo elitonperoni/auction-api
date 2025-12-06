@@ -21,13 +21,13 @@ jobs:
         username: ${{ secrets.GH_PACKAGES_USER }}
         password: ${{ secrets.GH_PACKAGES_TOKEN }}
         
-#    - run: |
-#        docker build -t ghcr.io/elitonperoni/auction-api/auction-api:latest -f src/AuctionApi/Dockerfile .
-#        docker tag ghcr.io/elitonperoni/auction-api/auction-api:latest ghcr.io/elitonperoni/auction-api/auction-api:${GITHUB_SHA}
+    - run: |
+        docker build -t ghcr.io/elitonperoni/auction-api/auction-api:latest -f src/AuctionApi/Dockerfile .
+        docker tag ghcr.io/elitonperoni/auction-api/auction-api:latest ghcr.io/elitonperoni/auction-api/auction-api:${GITHUB_SHA}
         
- #   - run: |
- #       docker push ghcr.io/elitonperoni/auction-api/auction-api:latest 
- #       docker push ghcr.io/elitonperoni/auction-api/auction-api:${GITHUB_SHA} 
+    - run: |
+        docker push ghcr.io/elitonperoni/auction-api/auction-api:latest 
+        docker push ghcr.io/elitonperoni/auction-api/auction-api:${GITHUB_SHA} 
 
 # 5. Conectar-se ao servidor via SSH e fazer as operações no servidor
     - name: Deploy to server
