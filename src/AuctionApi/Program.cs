@@ -31,9 +31,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     policy => policy
-        .WithOrigins("http://localhost:3000", 
-         "null",
-         "https://main.d2x71qee6ioduv.amplifyapp.com/")
+        .SetIsOriginAllowed(origin => true)
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
