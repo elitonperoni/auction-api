@@ -33,7 +33,7 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     policy => policy
         .WithOrigins("http://localhost:3000", 
          "null",
-         "https://jwlqffjzhex7z6g5sf22lj37ha0wapjm.lambda-url.us-east-2.on.aws/")
+         "https://main.d2x71qee6ioduv.amplifyapp.com/")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
