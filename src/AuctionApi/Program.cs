@@ -31,9 +31,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     policy => policy
-        .WithOrigins("http://localhost:3000", 
-         "null",
-         "https://jwlqffjzhex7z6g5sf22lj37ha0wapjm.lambda-url.us-east-2.on.aws/")
+        .SetIsOriginAllowed(origin => true)
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
