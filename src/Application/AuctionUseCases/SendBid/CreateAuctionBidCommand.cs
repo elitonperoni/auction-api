@@ -7,7 +7,7 @@ using Application.Abstractions.Messaging;
 
 namespace Application.AuctionUseCases.SendBid;
 
-public sealed class CreateAuctionBidCommand : ICommand<Guid>
+public sealed class CreateAuctionBidCommand : ICommand<int>
 {
     public Guid UserId { get; set; }
     public Guid AuctionId { get; set; }    

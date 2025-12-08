@@ -21,7 +21,7 @@ internal sealed class Create : IEndpoint
     {
         app.MapPost("send", async (
             Request request,
-            ICommandHandler<CreateAuctionBidCommand, Guid> handler,
+            ICommandHandler<CreateAuctionBidCommand, int> handler,
             IHubContext<AuctionHub> hubContext,
             CancellationToken cancellationToken) =>
         {
@@ -31,18 +31,18 @@ internal sealed class Create : IEndpoint
                 BidPrice = request.Value
             };
 
-            Result<Guid> result = await handler.Handle(command, cancellationToken);
+            Result<int> result = await handler.Handle(command, cancellationToken);
 
-            await hubContext.Clients.All.SendAsync("NovoLance", new
-            {
-                UserId = Guid.NewGuid(),
-                Value = 8500
-            }, cancellationToken);
+            //await hubContext.Clients.All.SendAsync("NovoLance", new
+            //{
+            //    UserId = Guid.NewGuid(),
+            //    Value = 8500
+            //}, cancellationToken);
 
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.AuctionBids);
+        .WithTags(Tags.Auction);
         //.RequireAuthorization();
     }
 }

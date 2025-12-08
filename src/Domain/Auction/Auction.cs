@@ -16,7 +16,7 @@ public sealed class Auction : Entity
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public decimal StartingPrice { get; set; }
-    public  Guid UserId { get; set; }
+    public Guid UserId { get; set; }
     public User? User { get; set; }
-    public List<Bid> Bids { get; set; } = [];
+    public ICollection<Bid>? Bids { get; set; } = [];
 }

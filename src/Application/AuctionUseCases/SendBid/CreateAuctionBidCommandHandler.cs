@@ -20,9 +20,9 @@ public class CreateAuctionBidCommandHandler(
     //IDateTimeProvider dateTimeProvider,
     //IUserContext userContext
 )
-    : ICommandHandler<CreateAuctionBidCommand, Guid>
+    : ICommandHandler<CreateAuctionBidCommand, int>
 {
-    public async Task<Result<Guid>> Handle(CreateAuctionBidCommand command, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(CreateAuctionBidCommand command, CancellationToken cancellationToken)
     {
         Bid auctionBid = new()
         {
@@ -35,6 +35,8 @@ public class CreateAuctionBidCommandHandler(
         await context.Bids.AddAsync(auctionBid, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(auctionBid.Id);
+        int bidCount = await context.Bids.CountAsync(b => b.AuctionId == command.AuctionId, cancellationToken);
+
+        return Result.Success(bidCount);
     }
 }

@@ -7,7 +7,8 @@ using SharedKernel;
 
 namespace Application.Todos.Get;
 
-internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserContext userContext)
+internal sealed class GetTodosQueryHandler(IApplicationDbContext context,
+    IUserContext userContext)
     : IQueryHandler<GetTodosQuery, List<TodoResponse>>
 {
     public async Task<Result<List<TodoResponse>>> Handle(GetTodosQuery query, CancellationToken cancellationToken)
