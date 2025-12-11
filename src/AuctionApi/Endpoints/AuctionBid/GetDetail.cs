@@ -23,8 +23,8 @@ internal sealed class GetDetail : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Auction);
-        //.RequireAuthorization();
+        .WithTags(Tags.Auction)
+        .RequireAuthorization();
     }
 }
 

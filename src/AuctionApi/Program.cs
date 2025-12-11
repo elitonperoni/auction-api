@@ -12,7 +12,10 @@ using AuctionApi.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-//builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 builder.Configuration
     .AddEnvironmentVariables();
@@ -54,10 +57,6 @@ if (app.Environment.IsDevelopment())
 //{
 //    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 //});
-
-//app.UseRequestContextLogging();
-
-//app.UseSerilogRequestLogging();
 
 app.UseExceptionHandler();
 

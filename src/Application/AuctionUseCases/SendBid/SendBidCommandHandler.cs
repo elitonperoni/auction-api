@@ -15,15 +15,20 @@ using SharedKernel;
 
 namespace Application.AuctionUseCases.SendBid;
 
-public class CreateAuctionBidCommandHandler(
+public class SendBidCommandHandler(
     IApplicationDbContext context
     //IDateTimeProvider dateTimeProvider,
     //IUserContext userContext
 )
-    : ICommandHandler<CreateAuctionBidCommand, int>
+    : ICommandHandler<SendBidCommand, int>
 {
-    public async Task<Result<int>> Handle(CreateAuctionBidCommand command, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(SendBidCommand command, CancellationToken cancellationToken)
     {
+        if (!IsValidBid(command.AuctionId, command.BidPrice))
+        {
+            return Result.Failure<int>(Error.Failure("TodoItems.AlreadyCompleted", "Lance enviado é inferior ao mínimo"));
+        }            
+
         Bid auctionBid = new()
         {
             UserId = command.UserId,
@@ -38,5 +43,12 @@ public class CreateAuctionBidCommandHandler(
         int bidCount = await context.Bids.CountAsync(b => b.AuctionId == command.AuctionId, cancellationToken);
 
         return Result.Success(bidCount);
+    }
+
+    private bool IsValidBid(Guid auctionId, decimal bidPrice)
+    {
+        decimal maxAmount = context.Bids.Where(x => x.AuctionId == auctionId).Max(p => p.Amount);
+
+        return bidPrice > maxAmount;
     }
 }

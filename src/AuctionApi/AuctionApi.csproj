@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <UserSecretsId>7af30323-108a-4923-bd46-e13b7648968c</UserSecretsId>
+    <UserSecretsId>64eb63ef-eeee-41b4-a6cd-04ce21f1110f</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
     <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>

@@ -21,11 +21,11 @@ internal sealed class Create : IEndpoint
     {
         app.MapPost("send", async (
             Request request,
-            ICommandHandler<CreateAuctionBidCommand, int> handler,
+            ICommandHandler<SendBidCommand, int> handler,
             IHubContext<AuctionHub> hubContext,
             CancellationToken cancellationToken) =>
         {
-            var command = new CreateAuctionBidCommand
+            var command = new SendBidCommand
             {
                 UserId = request.UserId,
                 BidPrice = request.Value

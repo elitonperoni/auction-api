@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿
 <Project ToolsVersion="15.0" Sdk="Microsoft.Docker.Sdk">
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
@@ -8,6 +8,7 @@
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>AuctionApi</DockerServiceName>
     <DockerComposeProjectName>clean-architecture</DockerComposeProjectName>
+    <UserSecretsId>64eb63ef-eeee-41b4-a6cd-04ce21f1110f</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
