@@ -53,10 +53,10 @@ if (app.Environment.IsDevelopment())
     app.ApplyMigrations();
 }
 
-//app.MapHealthChecks("health", new HealthCheckOptions
-//{
-//    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-//});
+app.MapHealthChecks("health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.UseExceptionHandler();
 

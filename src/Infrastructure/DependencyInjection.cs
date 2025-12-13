@@ -1,12 +1,15 @@
 ﻿using System.Text;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
+using Application.Abstractions.Mail;
 using Application.Common.Interfaces;
+using AuctionApi.Common;
 using Infrastructure.Authentication;
 using Infrastructure.Authorization;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Hubs;
+using Infrastructure.Mail;
 using Infrastructure.Notifications;
 using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,19 +30,21 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration) =>
         services
-            .AddServices()
+            .AddServices(configuration)
             .AddDatabase(configuration)
-            //.AddHealthChecks(configuration)
+            .AddHealthChecks(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal();
 
-    private static IServiceCollection AddServices(this IServiceCollection services)
+    private static IServiceCollection AddServices(this IServiceCollection services,  IConfiguration configuration)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
         services.AddScoped<IAuctionNotifier, SignalRNotifications>();
+
+        services.Configure<SecretsApi>(configuration.GetSection("SecretsApi"));
 
         return services;
     }
@@ -59,14 +64,14 @@ public static class DependencyInjection
         return services;
     }
 
-    //private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
-    //{
-    //    services
-    //        .AddHealthChecks()
-    //        .AddNpgSql(configuration.GetConnectionString("Database")!);
+    private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddHealthChecks()
+            .AddNpgSql(configuration.GetConnectionString("Database")!);
 
-    //    return services;
-    //}
+        return services;
+    }
 
     private static IServiceCollection AddAuthenticationInternal(
         this IServiceCollection services,
@@ -102,6 +107,7 @@ public static class DependencyInjection
         services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
+        services.AddSingleton<IMailSender, MailSender>();
 
         return services;
     }
