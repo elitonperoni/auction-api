@@ -1,5 +1,8 @@
 using System.Reflection;
+using Amazon.S3;
 using Application;
+using AuctionApi;
+using AuctionApi.Extensions;
 using HealthChecks.UI.Client;
 using Infrastructure;
 using Infrastructure.Hubs;
@@ -7,8 +10,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using AuctionApi;
-using AuctionApi.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
         .AllowAnyMethod()
         .AllowCredentials() 
 ));
+
 
 WebApplication app = builder.Build();
 

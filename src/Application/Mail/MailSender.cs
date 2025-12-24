@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using Application.Abstractions.Mail;
-using Application.Mail;
-using AuctionApi.Common;
+using Domain.Configurations;
 using Microsoft.Extensions.Options;
 
-namespace Infrastructure.Mail;
+namespace Application.Mail;
 
 
 public sealed class MailSender : IMailSender

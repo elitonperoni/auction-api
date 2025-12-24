@@ -1,24 +1,26 @@
 ﻿using System.Text;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.S3;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Mail;
 using Application.Common.Interfaces;
-using AuctionApi.Common;
+using Application.Mail;
+using Domain.Configurations;
 using Infrastructure.Authentication;
 using Infrastructure.Authorization;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
-using Infrastructure.Hubs;
-using Infrastructure.Mail;
+using Infrastructure.ExternalServices;
 using Infrastructure.Notifications;
 using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel;
 
@@ -45,6 +47,28 @@ public static class DependencyInjection
         services.AddScoped<IAuctionNotifier, SignalRNotifications>();
 
         services.Configure<SecretsApi>(configuration.GetSection("SecretsApi"));
+
+        
+        IConfigurationSection awsSection = configuration.GetSection("AWS");
+        services.Configure<AwsConfig>(awsSection);
+
+        //services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+        //services.AddAWSService<IAmazonS3>();
+
+
+        ////// 2. Cria as credenciais manualmente com os dados do JSON
+        var credentials = new Amazon.Runtime.BasicAWSCredentials(
+            awsSection["AccessKey"],
+            awsSection["SecretKey"]
+        );
+
+        //// 3. Define a região
+        var region = Amazon.RegionEndpoint.GetBySystemName(awsSection["Region"] ?? "us-east-2");
+
+        //// 4. Registra o IAmazonS3 forçando o uso dessas credenciais
+        services.AddSingleton<IAmazonS3>(sp =>
+            new AmazonS3Client(credentials, region)
+        );
 
         return services;
     }
@@ -104,10 +128,13 @@ public static class DependencyInjection
             });
 
         services.AddHttpContextAccessor();
-        services.AddScoped<IUserContext, UserContext>();
+
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
         services.AddSingleton<IMailSender, MailSender>();
+
+        services.AddScoped<IUserContext, UserContext>();
+        services.AddScoped<IS3Service, S3Service>();  
 
         return services;
     }

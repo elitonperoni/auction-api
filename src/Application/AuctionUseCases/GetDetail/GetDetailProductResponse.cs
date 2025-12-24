@@ -18,8 +18,15 @@ public sealed class GetDetailProductResponse
     public string Seller { get; set; }
     public string Condition { get; set; }
     public string Location { get; set; }
-    public List<KeyValuePair<string, decimal>> BidHistory { get; set; }
+    public List<BidHistoryItem> BidHistory { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public string[] Images { get; set; }
+    public List<string> Photos { get; set; }
+}
+
+public sealed class BidHistoryItem
+{
+    public string BidderName { get; set; }
+    public DateTime Date { get; set; }
+    public decimal Amount { get; set; }
 }

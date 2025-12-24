@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace AuctionApi.Extensions;
+namespace Application.Extensions;
 
 public static class TokenGenerator
 {

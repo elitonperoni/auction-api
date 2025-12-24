@@ -1,48 +1,54 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.AuctionUseCases.SendBid;
-using Application.Todos.Create;
-using Infrastructure.Hubs;
-using Microsoft.AspNetCore.SignalR;
-using SharedKernel;
+using Application.AuctionUseCases.Create;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
+using Infrastructure.Hubs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using SharedKernel;
 
 namespace AuctionApi.Endpoints.AuctionBid;
 
-internal sealed class Create : IEndpoint
+public class Create : IEndpoint
 {
     public sealed class Request
     {
-        public Guid UserId { get; set; }
-        public decimal Value { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public DateTime StartDate { get; set; }
+        public decimal StartingPrice { get; set; }
+        public IFormFileCollection Images { get; set; }
     }
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("send", async (
-            Request request,
-            ICommandHandler<SendBidCommand, int> handler,
-            IHubContext<AuctionHub> hubContext,
+        app.MapPost("new", async (
+            [FromForm] Request request,
+            ICommandHandler<CreateAuctionCommand, Guid> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new SendBidCommand
+            var imageModels = request.Images.Select(file =>
+                new FileInput(
+                    file.OpenReadStream(),
+                    file.FileName,
+                    file.ContentType
+                )).ToList();
+
+            var command = new CreateAuctionCommand
             {
-                UserId = request.UserId,
-                BidPrice = request.Value
+                Title = request.Title,
+                Description = request.Description,
+                StartDate = request.StartDate,
+                StartingPrice = request.StartingPrice,
+                ImageStreams = imageModels,
             };
 
-            Result<int> result = await handler.Handle(command, cancellationToken);
-
-            //await hubContext.Clients.All.SendAsync("NovoLance", new
-            //{
-            //    UserId = Guid.NewGuid(),
-            //    Value = 8500
-            //}, cancellationToken);
-
+            Result<Guid> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Auction);
+        .WithTags(Tags.Auction)
+        .DisableAntiforgery();
         //.RequireAuthorization();
     }
 }

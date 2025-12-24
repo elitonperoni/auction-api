@@ -1,4 +1,4 @@
-﻿namespace AuctionApi.Common;
+﻿namespace Domain.Configurations;
 
 public class SecretsApi
 {

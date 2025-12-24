@@ -1,10 +1,9 @@
-﻿using System.Security.Cryptography;
-using Application.Abstractions.Data;
+﻿using Application.Abstractions.Data;
 using Application.Abstractions.Mail;
 using Application.Abstractions.Messaging;
+using Application.Extensions;
 using Application.Mail;
-using AuctionApi.Common;
-using AuctionApi.Extensions;
+using Domain.Configurations;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

@@ -71,8 +71,6 @@ public class AuctionHub(ICommandHandler<SendBidCommand, int> handler) : Hub
         decimal newCurrentBid = bidAmount;
         int newTotalBids = bidCount.Value;
 
-        string newBidTime = DateTimeExtension.GetCurrentTime();
-
         //Notifiy Caller
         await Clients.Caller.SendAsync(
             ChannelNames.ReceiveNewBid,
@@ -80,7 +78,7 @@ public class AuctionHub(ICommandHandler<SendBidCommand, int> handler) : Hub
             newCurrentBid,
             newTotalBids,
             userName,
-            newBidTime,
+            DateTime.UtcNow,
             true);
 
         //Notify others
@@ -89,8 +87,8 @@ public class AuctionHub(ICommandHandler<SendBidCommand, int> handler) : Hub
             groupName,                
             newCurrentBid,            
             newTotalBids,              
-            userName,             
-            newBidTime,
+            userName,
+            DateTime.UtcNow,
             false            
         );        
     }
