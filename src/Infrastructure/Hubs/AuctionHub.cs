@@ -17,7 +17,7 @@ using SharedKernel;
 namespace Infrastructure.Hubs;
 
 [Authorize]
-public class AuctionHub(ICommandHandler<SendBidCommand, int> handler) : Hub
+public class AuctionHub(ICommandHandler<SendBidCommand, SendBidDtoResponse> handler) : Hub
 {
     public async Task JoinAuctionGroup(string groupName)
     {
@@ -61,34 +61,37 @@ public class AuctionHub(ICommandHandler<SendBidCommand, int> handler) : Hub
             return;
         }
 
-        Result<int> bidCount = await handler.Handle(new SendBidCommand
+        Result<SendBidDtoResponse> bid = await handler.Handle(new SendBidCommand
         {
             AuctionId = Guid.Parse(groupName), 
             UserId = userId,
             BidPrice = bidAmount,
         }, CancellationToken.None);
 
-        decimal newCurrentBid = bidAmount;
-        int newTotalBids = bidCount.Value;
+        if (bid.IsFailure)
+        {
+            await Clients.Caller.SendAsync("BidError", bid.Error);
+            return;
+        }
 
         //Notifiy Caller
         await Clients.Caller.SendAsync(
             ChannelNames.ReceiveNewBid,
             groupName,
-            newCurrentBid,
-            newTotalBids,
+            bid.Value.Amount,
+            bid.Value.TotalBids,
             userName,
-            DateTime.UtcNow,
+            bid.Value.Date,
             true);
 
         //Notify others
         await Clients.GroupExcept(groupName.ToString(), Context!.ConnectionId).SendAsync(
             ChannelNames.ReceiveNewBid,
-            groupName,                
-            newCurrentBid,            
-            newTotalBids,              
+            groupName,
+            bid.Value.Amount,
+            bid.Value.TotalBids,              
             userName,
-            DateTime.UtcNow,
+            bid.Value.Date,
             false            
         );        
     }

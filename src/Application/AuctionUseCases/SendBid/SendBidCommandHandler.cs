@@ -20,13 +20,13 @@ public class SendBidCommandHandler(
     //IDateTimeProvider dateTimeProvider,
     //IUserContext userContext
 )
-    : ICommandHandler<SendBidCommand, int>
+    : ICommandHandler<SendBidCommand, SendBidDtoResponse>
 {
-    public async Task<Result<int>> Handle(SendBidCommand command, CancellationToken cancellationToken)
+    public async Task<Result<SendBidDtoResponse>> Handle(SendBidCommand command, CancellationToken cancellationToken)
     {
         if (!IsValidBid(command.AuctionId, command.BidPrice))
         {
-            return Result.Failure<int>(Error.Failure("TodoItems.AlreadyCompleted", "Lance enviado é inferior ao mínimo"));
+            return Result.Failure<SendBidDtoResponse>(Error.Failure("TodoItems.AlreadyCompleted", "Lance enviado é inferior ao mínimo"));
         }            
 
         Bid auctionBid = new()
@@ -42,7 +42,7 @@ public class SendBidCommandHandler(
 
         int bidCount = await context.Bids.CountAsync(b => b.AuctionId == command.AuctionId, cancellationToken);
 
-        return Result.Success(bidCount);
+        return Result.Success(new SendBidDtoResponse() { TotalBids = bidCount, Date = auctionBid.BidDate, Amount = auctionBid.Amount });
     }
 
     private bool IsValidBid(Guid auctionId, decimal bidPrice)
