@@ -1,54 +1,74 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Abstractions.Authentication;
-using Application.Abstractions.Data;
+﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Common.Interfaces;
-using Application.Todos.Complete;
 using Domain.Auction;
-using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using SharedKernel;
 
 namespace Application.AuctionUseCases.SendBid;
 
 public class SendBidCommandHandler(
     IApplicationDbContext context
-    //IDateTimeProvider dateTimeProvider,
-    //IUserContext userContext
 )
     : ICommandHandler<SendBidCommand, SendBidDtoResponse>
 {
     public async Task<Result<SendBidDtoResponse>> Handle(SendBidCommand command, CancellationToken cancellationToken)
     {
-        if (!IsValidBid(command.AuctionId, command.BidPrice))
+        using IDbContextTransaction transaction = await context.BeginTransactionAsync(cancellationToken);
+
+        try
         {
-            return Result.Failure<SendBidDtoResponse>(Error.Failure("TodoItems.AlreadyCompleted", "Lance enviado é inferior ao mínimo"));
-        }            
+            await context.ExecuteSqlRawAsync(
+               "SELECT 1 FROM \"auctions\" WHERE \"id\" = @p0 FOR UPDATE",
+                new object[] { command.AuctionId },
+                cancellationToken);
 
-        Bid auctionBid = new()
+            decimal currentMax = await context.Bids
+                .Where(b => b.AuctionId == command.AuctionId)
+                .MaxAsync(b => (decimal?)b.Amount, cancellationToken) ?? 0;
+
+            if (command.BidPrice <= currentMax)
+            {
+                return Result.Failure<SendBidDtoResponse>(
+                    Error.Failure("Bid.Invalid", $"O lance de {command.BidPrice:C} é inferior ao atual {currentMax:C}"));
+            }
+
+            Bid auctionBid = new()
+            {
+                UserId = command.UserId,
+                AuctionId = command.AuctionId,
+                Amount = command.BidPrice,
+                BidDate = DateTime.UtcNow
+            };
+
+            await context.Bids.AddAsync(auctionBid, cancellationToken);
+
+            await context.SaveChangesAsync(cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+
+            int bidCount = await context.Bids
+                .CountAsync(b => b.AuctionId == command.AuctionId, cancellationToken);
+
+            return Result.Success(new SendBidDtoResponse
+            {
+                TotalBids = bidCount,
+                Date = auctionBid.BidDate,
+                Amount = auctionBid.Amount
+            });
+        }
+        catch (DbUpdateException)
         {
-            UserId = command.UserId,
-            AuctionId = command.AuctionId,
-            Amount = command.BidPrice,
-            BidDate = DateTime.UtcNow
-        };
-
-        await context.Bids.AddAsync(auctionBid, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
-
-        int bidCount = await context.Bids.CountAsync(b => b.AuctionId == command.AuctionId, cancellationToken);
-
-        return Result.Success(new SendBidDtoResponse() { TotalBids = bidCount, Date = auctionBid.BidDate, Amount = auctionBid.Amount });
-    }
-
-    private bool IsValidBid(Guid auctionId, decimal bidPrice)
-    {
-        decimal maxAmount = context.Bids.Where(x => x.AuctionId == auctionId).Max(p => p.Amount);
-
-        return bidPrice > maxAmount;
+            await transaction.RollbackAsync(cancellationToken);
+            return Result.Failure<SendBidDtoResponse>(
+                Error.Failure("Bid.Conflict", "Concorrência detectada: este lance já foi superado."));
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return Result.Failure<SendBidDtoResponse>(
+                Error.Failure("Bid.Conflict", ex.Message));
+            throw;
+        }
     }
 }
