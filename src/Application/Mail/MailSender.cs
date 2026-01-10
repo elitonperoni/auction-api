@@ -25,7 +25,7 @@ public sealed class MailSender : IMailSender
         mailMessage.Subject = requestEmail.Subject;
         mailMessage.IsBodyHtml = true;
         mailMessage.To.Add(requestEmail.To);
-        smtpClient.Send(mailMessage);
+        await smtpClient.SendMailAsync(mailMessage);
 
         smtpClient.Dispose();
         mailMessage.Dispose();
