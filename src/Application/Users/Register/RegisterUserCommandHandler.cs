@@ -1,4 +1,6 @@
-﻿using Application.Abstractions.Authentication;
+﻿using System.Net;
+using System.Net.Mail;
+using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Users;

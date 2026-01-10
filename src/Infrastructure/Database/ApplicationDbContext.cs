@@ -5,6 +5,7 @@ using Domain.Todos;
 using Domain.Users;
 using Infrastructure.DomainEvents;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using SharedKernel;
 
 namespace Infrastructure.Database;
@@ -25,6 +26,15 @@ public sealed class ApplicationDbContext(
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
         modelBuilder.HasDefaultSchema(Schemas.Default);
+
+        modelBuilder.Entity<Bid>()
+            .HasIndex(b => new { b.AuctionId, b.Amount })
+            .IsUnique();
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        return await Database.BeginTransactionAsync(cancellationToken);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -62,5 +72,10 @@ public sealed class ApplicationDbContext(
             .ToList();
 
         await domainEventsDispatcher.DispatchAsync(domainEvents);
+    }
+
+    public async Task<int> ExecuteSqlRawAsync(string sql, IEnumerable<object> parameters, CancellationToken cancellationToken = default)
+    {
+        return await Database.ExecuteSqlRawAsync(sql, parameters, cancellationToken);
     }
 }

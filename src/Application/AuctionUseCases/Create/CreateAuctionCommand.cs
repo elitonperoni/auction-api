@@ -13,5 +13,6 @@ public class CreateAuctionCommand : ICommand<Guid>
     public string Description { get; set; }
     public DateTime StartDate { get; set; }
     public decimal StartingPrice { get; set; }
-    public Guid UserId { get; set; }
-}
+    public List<FileInput> ImageStreams { get; set; }}
+
+public record FileInput(Stream Stream, string FileName, string ContentType);

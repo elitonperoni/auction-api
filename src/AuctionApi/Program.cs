@@ -1,5 +1,8 @@
 using System.Reflection;
+using Amazon.S3;
 using Application;
+using AuctionApi;
+using AuctionApi.Extensions;
 using HealthChecks.UI.Client;
 using Infrastructure;
 using Infrastructure.Hubs;
@@ -7,12 +10,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using AuctionApi;
-using AuctionApi.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-//builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 builder.Configuration
     .AddEnvironmentVariables();
@@ -37,6 +41,7 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
         .AllowCredentials() 
 ));
 
+
 WebApplication app = builder.Build();
 
 app.UseCors("CorsPolicy");
@@ -50,14 +55,10 @@ if (app.Environment.IsDevelopment())
     app.ApplyMigrations();
 }
 
-//app.MapHealthChecks("health", new HealthCheckOptions
-//{
-//    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-//});
-
-//app.UseRequestContextLogging();
-
-//app.UseSerilogRequestLogging();
+app.MapHealthChecks("health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.UseExceptionHandler();
 

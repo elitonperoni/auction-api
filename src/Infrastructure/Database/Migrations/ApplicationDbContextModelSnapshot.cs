@@ -92,10 +92,44 @@ namespace Infrastructure.Database.Migrations
                     b.HasKey("Id")
                         .HasName("pk_bids");
 
-                    b.HasIndex("AuctionId")
-                        .HasDatabaseName("ix_bids_auction_id");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_bids_user_id");
+
+                    b.HasIndex("AuctionId", "Amount")
+                        .IsUnique()
+                        .HasDatabaseName("ix_bids_auction_id_amount");
 
                     b.ToTable("bids", "public");
+                });
+
+            modelBuilder.Entity("Domain.Auction.ProductPhoto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AuctionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("auction_id");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content_type");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_product_photo");
+
+                    b.HasIndex("AuctionId")
+                        .HasDatabaseName("ix_product_photo_auction_id");
+
+                    b.ToTable("product_photo", "public");
                 });
 
             modelBuilder.Entity("Domain.Todos.TodoItem", b =>
@@ -175,6 +209,14 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password_hash");
 
+                    b.Property<string>("ResetToken")
+                        .HasColumnType("text")
+                        .HasColumnName("reset_token");
+
+                    b.Property<DateTime?>("ResetTokenExpiry")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reset_token_expiry");
+
                     b.HasKey("Id")
                         .HasName("pk_users");
 
@@ -206,6 +248,27 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_bids_auctions_auction_id");
 
+                    b.HasOne("Domain.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_bids_users_user_id");
+
+                    b.Navigation("Auction");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Auction.ProductPhoto", b =>
+                {
+                    b.HasOne("Domain.Auction.Auction", "Auction")
+                        .WithMany("Photos")
+                        .HasForeignKey("AuctionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_product_photo_auctions_auction_id");
+
                     b.Navigation("Auction");
                 });
 
@@ -222,6 +285,8 @@ namespace Infrastructure.Database.Migrations
             modelBuilder.Entity("Domain.Auction.Auction", b =>
                 {
                     b.Navigation("Bids");
+
+                    b.Navigation("Photos");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,4 +9,6 @@ public sealed class User : Entity
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string PasswordHash { get; set; }
+    public string? ResetToken { get; set; }
+    public DateTime? ResetTokenExpiry { get; set; }
 }

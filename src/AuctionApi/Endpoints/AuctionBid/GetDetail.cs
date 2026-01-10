@@ -1,0 +1,30 @@
+﻿using Application.Abstractions.Messaging;
+using Application.AuctionUseCases.GetDetail;
+using Application.AuctionUseCases.SendBid;
+using AuctionApi.Extensions;
+using AuctionApi.Infrastructure;
+using Infrastructure.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using SharedKernel;
+
+namespace AuctionApi.Endpoints.AuctionBid;
+
+internal sealed class GetDetail : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)  
+    {
+        app.MapGet("auctions/details/{id:guid}", async (
+            IQueryHandler<GetDetailProductQuery, GetDetailProductResponse> handler,
+            Guid id,
+            CancellationToken cancellationToken) =>
+        {
+            Result<GetDetailProductResponse> result =
+                await handler.Handle(new GetDetailProductQuery(id), cancellationToken);
+
+            return result.Match(Results.Ok, CustomResults.Problem);
+        })
+        .WithTags(Tags.Auction)
+        .RequireAuthorization();
+    }
+}
+

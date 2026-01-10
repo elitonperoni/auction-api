@@ -17,7 +17,7 @@ using SharedKernel;
 namespace Infrastructure.Hubs;
 
 [Authorize]
-public class AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler) : Hub
+public class AuctionHub(ICommandHandler<SendBidCommand, SendBidDtoResponse> handler) : Hub
 {
     public async Task JoinAuctionGroup(string groupName)
     {
@@ -61,38 +61,38 @@ public class AuctionHub(ICommandHandler<CreateAuctionBidCommand, Guid> handler) 
             return;
         }
 
-        await handler.Handle(new CreateAuctionBidCommand
+        Result<SendBidDtoResponse> bid = await handler.Handle(new SendBidCommand
         {
             AuctionId = Guid.Parse(groupName), 
             UserId = userId,
             BidPrice = bidAmount,
         }, CancellationToken.None);
 
-        decimal newCurrentBid = bidAmount;
-        int newTotalBids = 20 + 1;
-
-        string newBidTime = DateTimeExtension.GetCurrentTime();
+        if (bid.IsFailure)
+        {
+            await Clients.Caller.SendAsync("BidError", bid.Error);
+            return;
+        }
 
         //Notifiy Caller
         await Clients.Caller.SendAsync(
             ChannelNames.ReceiveNewBid,
             groupName,
-            newCurrentBid,
-            newTotalBids,
+            bid.Value.Amount,
+            bid.Value.TotalBids,
             userName,
-            newBidTime,
-            true
-        );
+            bid.Value.Date,
+            true);
 
         //Notify others
         await Clients.GroupExcept(groupName.ToString(), Context!.ConnectionId).SendAsync(
             ChannelNames.ReceiveNewBid,
-            groupName,                
-            newCurrentBid,            
-            newTotalBids,              
-            userName,             
-            newBidTime,
-            false
+            groupName,
+            bid.Value.Amount,
+            bid.Value.TotalBids,              
+            userName,
+            bid.Value.Date,
+            false            
         );        
     }
 
