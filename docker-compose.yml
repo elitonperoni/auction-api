@@ -12,20 +12,6 @@ services:
     networks:
       - auction-network
 
-  #postgres:
-  #  image: postgres:17
-  #  container_name: postgres
-  ###  environment:
-  #    - POSTGRES_DB=clean-architecture
-  ##    - POSTGRES_USER=postgres
-  #    - POSTGRES_PASSWORD=postgres
-  #  volumes:
-  #    - ./.containers/db:/var/lib/postgresql/data
-  #  ports:
-  #    - 5432:5432
-  #  networks:
-  #    - auction-network
-
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
