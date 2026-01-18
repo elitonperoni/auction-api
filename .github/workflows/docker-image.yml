@@ -32,7 +32,7 @@ jobs:
 
     #WORKER BACK END
     - run: |
-        docker build -t ghcr.io/elitonperoni/auction-api/auction-worker:latest -f src/Auction.Worker/Dockerfile .
+        docker build -t ghcr.io/elitonperoni/auction-api/auction-worker:latest -f src/Auction.Worker/Auction.Worker/Dockerfile .
         docker tag ghcr.io/elitonperoni/auction-api/auction-worker:latest ghcr.io/elitonperoni/auction-api/auction-worker:${GITHUB_SHA}
         
     - run: |
