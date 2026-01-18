@@ -50,5 +50,6 @@ jobs:
         script: |        
           cd docker/api-auction
           docker compose down
-          docker rmi ghcr.io/elitonperoni/auction-api/auction-api:latest || true                  
+          docker rmi ghcr.io/elitonperoni/auction-api/auction-api:latest || true         
+          ghcr.io/elitonperoni/auction-api/auction-worker:latest || true
           docker compose up -d
