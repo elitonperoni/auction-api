@@ -1,11 +1,9 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Todos.Create;
-using Domain.Todos;
-using Infrastructure.Hubs;
-using Microsoft.AspNetCore.SignalR;
-using SharedKernel;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
+using Domain.Todos;
+using SharedKernel;
 
 namespace AuctionApi.Endpoints.Todos;
 

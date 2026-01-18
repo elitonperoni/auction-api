@@ -32,6 +32,6 @@ internal sealed class LoginUserCommandHandler(
 
         string token = tokenProvider.Create(user);
 
-        return new LoginResponse { Token = token, UserName = user.FirstName };
+        return new LoginResponse { Id = user.Id, Name = user.FirstName, Token = token };
     }
 }

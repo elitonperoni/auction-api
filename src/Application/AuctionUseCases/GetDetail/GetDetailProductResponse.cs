@@ -21,7 +21,7 @@ public sealed class GetDetailProductResponse
     public List<BidHistoryItem> BidHistory { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public List<string> Photos { get; set; }
+    public List<string>? Photos { get; set; }
 }
 
 public sealed class BidHistoryItem

@@ -1,10 +1,7 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.AuctionUseCases.GetDetail;
-using Application.AuctionUseCases.SendBid;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
-using Infrastructure.Hubs;
-using Microsoft.AspNetCore.SignalR;
 using SharedKernel;
 
 namespace AuctionApi.Endpoints.AuctionBid;

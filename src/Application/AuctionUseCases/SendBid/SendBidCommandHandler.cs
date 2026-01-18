@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Auction;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using SharedKernel;
@@ -14,8 +15,8 @@ public class SendBidCommandHandler(
 {
     public async Task<Result<SendBidDtoResponse>> Handle(SendBidCommand command, CancellationToken cancellationToken)
     {
+        context.ChangeTracker.Clear();
         using IDbContextTransaction transaction = await context.BeginTransactionAsync(cancellationToken);
-
         try
         {
             await context.ExecuteSqlRawAsync(
@@ -23,14 +24,19 @@ public class SendBidCommandHandler(
                 new object[] { command.AuctionId },
                 cancellationToken);
 
-            decimal currentMax = await context.Bids
-                .Where(b => b.AuctionId == command.AuctionId)
-                .MaxAsync(b => (decimal?)b.Amount, cancellationToken) ?? 0;
+            Auction? auction = await context.Auctions
+                .SingleOrDefaultAsync(p => p.Id == command.AuctionId, cancellationToken);
 
-            if (command.BidPrice <= currentMax)
+            if (auction is null)
             {
                 return Result.Failure<SendBidDtoResponse>(
-                    Error.Failure("Bid.Invalid", $"O lance de {command.BidPrice:C} é inferior ao atual {currentMax:C}"));
+                    Error.Failure("Bid.Invalid", $"Produto não encontrado"));
+            }
+
+            if (command.BidPrice <= auction.CurrentPrice)
+            {
+                return Result.Failure<SendBidDtoResponse>(
+                    Error.Failure("Bid.Invalid", $"O lance de {command.BidPrice:C} é inferior ao atual {auction.CurrentPrice:C}"));
             }
 
             Bid auctionBid = new()
@@ -38,21 +44,26 @@ public class SendBidCommandHandler(
                 UserId = command.UserId,
                 AuctionId = command.AuctionId,
                 Amount = command.BidPrice,
-                BidDate = DateTime.UtcNow
+                BidDate = DateTime.UtcNow                
             };
 
+            auction.CurrentPrice = command.BidPrice;
+            auction.LastBidderId = command.UserId;
+            auction.BidCount++;
+            
             await context.Bids.AddAsync(auctionBid, cancellationToken);
 
             await context.SaveChangesAsync(cancellationToken);
-
             await transaction.CommitAsync(cancellationToken);
 
-            int bidCount = await context.Bids
-                .CountAsync(b => b.AuctionId == command.AuctionId, cancellationToken);
+            User? user = await context.Users.AsNoTracking().SingleOrDefaultAsync(p => p.Id == command.UserId, cancellationToken);
 
             return Result.Success(new SendBidDtoResponse
             {
-                TotalBids = bidCount,
+                AuctionId = auctionBid.AuctionId,
+                LastBidderId = command.UserId,
+                LastBidderNamer = user?.FirstName ?? "",
+                TotalBids = auction.BidCount,
                 Date = auctionBid.BidDate,
                 Amount = auctionBid.Amount
             });
@@ -60,14 +71,11 @@ public class SendBidCommandHandler(
         catch (DbUpdateException)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return Result.Failure<SendBidDtoResponse>(
-                Error.Failure("Bid.Conflict", "Concorrência detectada: este lance já foi superado."));
+            throw;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return Result.Failure<SendBidDtoResponse>(
-                Error.Failure("Bid.Conflict", ex.Message));
             throw;
         }
     }

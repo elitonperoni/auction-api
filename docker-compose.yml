@@ -2,24 +2,55 @@ services:
   web-api:
     image: ${DOCKER_REGISTRY-}webapi
     container_name: web-api
+    restart: always
     build:
       context: .
-      dockerfile: src/AuctionApi/Dockerfile
+      dockerfile: src/AuctionApi/Dockerfile              
     ports:
       - 5000:8080
       - 5001:8081
+    networks:
+      - auction-network
 
-  postgres:
-    image: postgres:17
-    container_name: postgres
-    environment:
-      - POSTGRES_DB=clean-architecture
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    volumes:
-      - ./.containers/db:/var/lib/postgresql/data
+  #postgres:
+  #  image: postgres:17
+  #  container_name: postgres
+  ###  environment:
+  #    - POSTGRES_DB=clean-architecture
+  ##    - POSTGRES_USER=postgres
+  #    - POSTGRES_PASSWORD=postgres
+  #  volumes:
+  #    - ./.containers/db:/var/lib/postgresql/data
+  #  ports:
+  #    - 5432:5432
+  #  networks:
+  #    - auction-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
     ports:
-      - 5432:5432
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - auction-network
+
+  worker-auction:
+    #container_name: worker-auction
+    restart: always
+    build:
+      context: .           
+      dockerfile: src/Auction.Worker/Auction.Worker/Dockerfile
+    deploy:
+      replicas: 2
+    environment:
+      - MT_LICENSE=Community      
+      - ConnectionStrings__Database=Host=54.167.188.217;Port=5432;Database=auction-dev;Username=admin;Password=Systemdba123!@#;Include Error Detail=true; Timeout=120
+    depends_on:
+      - rabbitmq         
+    networks:
+      - auction-network
 
   seq:
     image: datalust/seq:2024.3
@@ -28,3 +59,10 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - 8081:80
+    networks:
+      - auction-network
+
+# 1. Definir a rede no escopo global
+networks:
+  auction-network:
+    driver: bridge

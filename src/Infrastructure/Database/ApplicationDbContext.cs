@@ -30,6 +30,14 @@ public sealed class ApplicationDbContext(
         modelBuilder.Entity<Bid>()
             .HasIndex(b => new { b.AuctionId, b.Amount })
             .IsUnique();
+
+        modelBuilder.Entity<Auction>()
+            .Property<uint>("Version") 
+            .HasColumnName("xmin")   
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken()
+            .IsRowVersion();
     }
 
     public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
