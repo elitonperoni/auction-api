@@ -1,15 +1,13 @@
 using System.Reflection;
-using Amazon.S3;
 using Application;
 using AuctionApi;
+using AuctionApi.Consumer;
 using AuctionApi.Extensions;
+using AuctionApi.Hubs;
 using HealthChecks.UI.Client;
 using Infrastructure;
-using Infrastructure.Hubs;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MassTransit;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.IdentityModel.Tokens;
-using Serilog;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +26,23 @@ builder.Services
     .AddPresentation()
     .AddInfrastructure(builder.Configuration);
 
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<BidProcessedConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+}
+    );
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 

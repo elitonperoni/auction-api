@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Amazon.Extensions.NETCore.Setup;
 using Amazon.S3;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
@@ -12,11 +11,9 @@ using Infrastructure.Authorization;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.ExternalServices;
-using Infrastructure.Notifications;
 using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -44,11 +41,8 @@ public static class DependencyInjection
 
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
-        services.AddScoped<IAuctionNotifier, SignalRNotifications>();
+        services.Configure<SecretsApi>(configuration.GetSection("SecretsApi"));        
 
-        services.Configure<SecretsApi>(configuration.GetSection("SecretsApi"));
-
-        
         IConfigurationSection awsSection = configuration.GetSection("AWS");
         services.Configure<AwsConfig>(awsSection);
 

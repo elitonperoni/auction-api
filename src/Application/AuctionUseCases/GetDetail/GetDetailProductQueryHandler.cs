@@ -56,19 +56,19 @@ internal sealed class GetDetailProductQueryHandler(
             Id = auctionDb.Id,
             Title = auctionDb.Title,
             Description = auctionDb.Description,
-            CurrentBid = bids?.Max(p => p.Amount) ?? 0,
-            MinBid = Math.Round(bids?.Max(p => p.Amount) * 1.1M ?? 0, 0),
-            BidsCounts = bids?.Count ?? 0,
+            CurrentBid = auctionDb.CurrentPrice,
+            MinBid = bids.Any() ? Math.Round(bids.Max(p => p?.Amount) * 1.1M ?? 0, 0) : 0,
+            BidsCounts = auctionDb.BidCount,
             Category = "Diversos",
             Seller = auctionDb.User?.FirstName ?? "",
             Condition = "Novo",
             Location = "Curitiba, Paraná",
-            BidHistory = bids?.Select(bid => new BidHistoryItem()
+            BidHistory = bids.Any() ? bids.Select(bid => new BidHistoryItem()
             {
                 BidderName = bid.User?.FirstName.ToString() ?? "",
                 Amount = bid.Amount,
                 Date = bid.BidDate
-            }).ToList() ?? [],
+            }).ToList() : [],
             StartDate = auctionDb.StartDate,
             EndDate = auctionDb.EndDate,
             Photos = photosUrls
