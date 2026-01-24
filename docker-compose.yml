@@ -23,16 +23,17 @@ services:
       - auction-network
 
   worker-auction:
-    #container_name: worker-auction
+    container_name: worker-auction
     restart: always
     build:
       context: .           
       dockerfile: src/Auction.Worker/Auction.Worker/Dockerfile
-    deploy:
-      replicas: 2
+    #deploy:
+      #replicas: 2
     environment:
-      - MT_LICENSE=Community      
-      - ConnectionStrings__Database=Host=54.167.188.217;Port=5432;Database=auction-dev;Username=admin;Password=Systemdba123!@#;Include Error Detail=true; Timeout=120
+      - MT_LICENSE=Community   
+      - DOTNET_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - rabbitmq         
     networks:

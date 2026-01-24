@@ -13,14 +13,14 @@ public class Create : IEndpoint
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public decimal StartingPrice { get; set; }
         public IFormFileCollection Images { get; set; }
     }
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("new", async (
+        app.MapPost("auctions/new", async (
             [FromForm] Request request,
             ICommandHandler<CreateAuctionCommand, Guid> handler,
             CancellationToken cancellationToken) =>
@@ -36,7 +36,7 @@ public class Create : IEndpoint
             {
                 Title = request.Title,
                 Description = request.Description,
-                StartDate = request.StartDate,
+                EndDate = request.EndDate,
                 StartingPrice = request.StartingPrice,
                 ImageStreams = imageModels,
             };
@@ -46,7 +46,7 @@ public class Create : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .WithTags(Tags.Auction)
-        .DisableAntiforgery();
-        //.RequireAuthorization();
+        .DisableAntiforgery()
+        .RequireAuthorization();
     }
 }

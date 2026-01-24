@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260124144726_UpdateDateToTimeSpanWithoutTimeZone")]
+    partial class UpdateDateToTimeSpanWithoutTimeZone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +39,7 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnName("bid_count");
 
                     b.Property<decimal>("CurrentPrice")
-                        .HasColumnType("decimal(18, 4)")
+                        .HasColumnType("numeric")
                         .HasColumnName("current_price");
 
                     b.Property<string>("Description")
@@ -45,7 +48,7 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnName("description");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("end_date");
 
                     b.Property<Guid?>("LastBidderId")
@@ -53,11 +56,11 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnName("last_bidder_id");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("start_date");
 
                     b.Property<decimal>("StartingPrice")
-                        .HasColumnType("decimal(18, 4)")
+                        .HasColumnType("numeric")
                         .HasColumnName("starting_price");
 
                     b.Property<string>("Title")

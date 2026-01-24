@@ -38,7 +38,7 @@ public class S3Service(IAmazonS3 s3Client, IOptions<AwsConfig> awsOptions) : IS3
             BucketName = awsOptions.Value.BucketName,
             Key = $"{folder}/{fileName}",
             InputStream = imageStream,
-            ContentType = $"{contentType}"
+            ContentType = $"image/{contentType}"
         };
 
         await s3Client.PutObjectAsync(originalPutRequest);

@@ -20,7 +20,7 @@ public class SendBidCommandHandler(
         try
         {
             await context.ExecuteSqlRawAsync(
-               "SELECT 1 FROM \"auctions\" WHERE \"id\" = @p0 FOR UPDATE",
+               $"SELECT 1 FROM \"auctions\" WHERE \"id\" = @p0 FOR UPDATE",
                 new object[] { command.AuctionId },
                 cancellationToken);
 

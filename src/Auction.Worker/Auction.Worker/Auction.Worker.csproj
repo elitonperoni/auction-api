@@ -4,8 +4,7 @@
 	<UserSecretsId>64eb63ef-eeee-41b4-a6cd-04ce21f1110f</UserSecretsId>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-Auction.Worker-7d1990dc-f45f-481f-af40-b7fa325aba5f</UserSecretsId>
+    <ImplicitUsings>enable</ImplicitUsings>    
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
   </PropertyGroup>

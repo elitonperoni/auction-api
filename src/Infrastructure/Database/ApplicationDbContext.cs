@@ -6,6 +6,7 @@ using Domain.Users;
 using Infrastructure.DomainEvents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SharedKernel;
 
 namespace Infrastructure.Database;
@@ -38,6 +39,22 @@ public sealed class ApplicationDbContext(
             .ValueGeneratedOnAddOrUpdate()
             .IsConcurrencyToken()
             .IsRowVersion();
+    }
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+            .Properties<DateTime>()
+            .HaveConversion<DateTimeToUnspecifiedConverter>();
+    }
+
+    public class DateTimeToUnspecifiedConverter : ValueConverter<DateTime, DateTime>
+    {
+        public DateTimeToUnspecifiedConverter()
+            : base(
+               v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+               v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            )
+        { }
     }
 
     public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
