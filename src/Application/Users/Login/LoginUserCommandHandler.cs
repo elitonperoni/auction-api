@@ -15,7 +15,6 @@ internal sealed class LoginUserCommandHandler(
     public async Task<Result<LoginResponse>> Handle(LoginUserCommand command, CancellationToken cancellationToken)
     {
         User? user = await context.Users
-            .AsNoTracking()
             .SingleOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
 
         if (user is null)
@@ -30,8 +29,15 @@ internal sealed class LoginUserCommandHandler(
             return Result.Failure<LoginResponse>(UserErrors.NotFoundByEmail);
         }
 
-        string token = tokenProvider.Create(user);
+        string token = tokenProvider.GenerateAccessToken(user);
 
-        return new LoginResponse { Id = user.Id, Name = user.FirstName, Token = token };
+        string newRefreshToken = tokenProvider.GenerateRefreshToken();
+
+        user.RefreshToken = newRefreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        return new LoginResponse { Id = user.Id, Name = user.FirstName, Token = token, RefreshToken = newRefreshToken };
     }
 }

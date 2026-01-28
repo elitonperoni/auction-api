@@ -26,8 +26,8 @@ internal sealed class RecoveryPasswordRequestCommandHandler(
         }
 
         string token = TokenGenerator.GenerateSecureToken();
-        usuario.ResetToken = token;
-        usuario.ResetTokenExpiry = DateTime.UtcNow.AddHours(2);
+        usuario.ResetPasswordCode = token;
+        usuario.ResetPasswordExpiry = DateTime.UtcNow.AddHours(2);
 
         await context.SaveChangesAsync(cancellationToken);
 
