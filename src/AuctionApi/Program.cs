@@ -50,7 +50,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     policy => policy
-        .SetIsOriginAllowed(origin => true)
+        .WithOrigins("https://auction.openprojects.com.br/", "http://localhost:3000")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
