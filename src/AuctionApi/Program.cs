@@ -61,29 +61,30 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
 
 WebApplication app = builder.Build();
 
-app.UseCors("CorsPolicy");
+app.UseExceptionHandler();
 
-app.MapEndpoints();
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("CorsPolicy");
 
 app.UseSwaggerWithUi();
 
-if (app.Environment.IsDevelopment())
-{    
-    app.ApplyMigrations();
-}
+app.ApplyMigrations();
 
 app.MapHealthChecks("health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
-app.UseExceptionHandler();
-
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapEndpoints();
 
 app.MapHub<AuctionHub>("/auctionHub");
 
