@@ -48,9 +48,11 @@ builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 builder.Services.AddSignalR();
 
+string[] allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     policy => policy
-        .WithOrigins("https://auction.openprojects.com.br/", "http://localhost:3000")
+        .WithOrigins(allowedOrigins ?? [])
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
