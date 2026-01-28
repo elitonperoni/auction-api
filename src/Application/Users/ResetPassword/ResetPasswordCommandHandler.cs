@@ -18,15 +18,15 @@ internal sealed class ResetPasswordCommandHandler(
 {
     public async Task<Result<bool>> Handle(ResetPasswordCommand command, CancellationToken cancellationToken)
     {
-        User? usuario = await context.Users.FirstOrDefaultAsync(u => u.ResetToken == command.token, cancellationToken);
-        if (usuario == null || usuario.ResetTokenExpiry < DateTime.UtcNow || string.IsNullOrEmpty(command.password))
+        User? usuario = await context.Users.FirstOrDefaultAsync(u => u.ResetPasswordCode == command.token, cancellationToken);
+        if (usuario == null || usuario.ResetPasswordExpiry < DateTime.UtcNow || string.IsNullOrEmpty(command.password))
         {
             return Result.Failure<bool>(UserErrors.Unauthorized());
         }
 
         usuario.PasswordHash = passwordHasher.Hash(command.password);
-        usuario.ResetToken = null;
-        usuario.ResetTokenExpiry = null;
+        usuario.ResetPasswordCode = null;
+        usuario.ResetPasswordExpiry = null;
 
         context.Users.Update(usuario);
         await context.SaveChangesAsync(cancellationToken);

@@ -40,6 +40,8 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddRouting(); 
+builder.Services.AddAuthorization();
 
 IHost host = builder.Build();
 

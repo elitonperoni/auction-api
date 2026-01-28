@@ -72,8 +72,6 @@ public class AuctionHub(IPublishEndpoint publishEndpoint) : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        // A lógica de remoção do grupo pode ser mais complexa se houver muitos grupos
-        // Mas o ASP.NET Core geralmente gerencia a remoção automática na desconexão.
         await base.OnDisconnectedAsync(exception);
     }
 }

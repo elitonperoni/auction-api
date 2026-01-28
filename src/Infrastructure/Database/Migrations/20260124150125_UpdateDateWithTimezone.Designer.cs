@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260124150125_UpdateDateWithTimezone")]
+    partial class UpdateDateWithTimezone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,21 +230,13 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password_hash");
 
-                    b.Property<string>("RefreshToken")
+                    b.Property<string>("ResetToken")
                         .HasColumnType("text")
-                        .HasColumnName("refresh_token");
+                        .HasColumnName("reset_token");
 
-                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                    b.Property<DateTime?>("ResetTokenExpiry")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("refresh_token_expiry_time");
-
-                    b.Property<string>("ResetPasswordCode")
-                        .HasColumnType("text")
-                        .HasColumnName("reset_password_code");
-
-                    b.Property<DateTime?>("ResetPasswordExpiry")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("reset_password_expiry");
+                        .HasColumnName("reset_token_expiry");
 
                     b.HasKey("Id")
                         .HasName("pk_users");

@@ -8,7 +8,7 @@ using SharedKernel;
 namespace Application.AuctionUseCases.Create;
 public class CreateAuctionCommandHandler(
     IApplicationDbContext context,
-    //IS3Service s3Service,
+    IS3Service s3Service,
     IUserContext userContext
     )
     : ICommandHandler<CreateAuctionCommand, Guid>
@@ -17,21 +17,42 @@ public class CreateAuctionCommandHandler(
     {
         Guid userId = userContext.UserId;
 
-        //string fileName = $"{Guid.NewGuid().ToString()}";
-
-        //await s3Service.UploadImageAsync(command.ImageStream, "images", fileName, command.ContentType);
-
         Auction auction = new()
         {
             Title = command.Title,
             Description = command.Description,
-            StartDate = command.StartDate,
-            EndDate = DateTime.UtcNow.AddHours(24),
+            StartDate = DateTime.UtcNow,
+            EndDate = command.EndDate,
             StartingPrice = command.StartingPrice,
-            UserId = userId
+            CurrentPrice = command.StartingPrice,
+            UserId = userId,            
         };
 
         await context.Auctions.AddAsync(auction, cancellationToken);
+
+        if (command.ImageStreams.Any())
+        {
+            auction.Photos = [];
+
+            foreach (FileInput item in command.ImageStreams)
+            {
+                var idPhoto = Guid.NewGuid();
+                string contentType = item.ContentType.Replace("image/", "");
+                string fileName = $"{idPhoto}.{contentType}";
+
+                ProductPhoto photo = new()
+                {
+                    Id = idPhoto,
+                    Name = fileName,
+                    ContentType = contentType
+                };
+
+                auction.Photos.Add(photo);
+
+                await s3Service.UploadImageAsync(item.Stream, $"auction-product-photos/{auction.Id}", fileName, contentType);
+            }
+        }
+
         await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success(auction.Id);
