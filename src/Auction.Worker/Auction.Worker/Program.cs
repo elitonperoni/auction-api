@@ -18,7 +18,9 @@ builder.Configuration
 
 builder.Services
     .AddApplication()
-    .AddInfrastructure(builder.Configuration);
+    .AddInfrastructure(
+        builder.Configuration, 
+        builder.Environment.IsDevelopment());
 
 builder.Services.AddMassTransit(x =>
 {

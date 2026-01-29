@@ -24,7 +24,9 @@ builder.Services.AddSwaggerGenWithAuth();
 builder.Services
     .AddApplication()
     .AddPresentation()
-    .AddInfrastructure(builder.Configuration);
+    .AddInfrastructure(
+        builder.Configuration, 
+        builder.Environment.IsDevelopment());
 
 
 builder.Services.AddMassTransit(x =>

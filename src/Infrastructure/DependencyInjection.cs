@@ -29,12 +29,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration) =>
+        IConfiguration configuration,
+        bool isDevelopment) =>
         services
             .AddServices(configuration)
             .AddDatabase(configuration)
             .AddHealthChecks(configuration)
-            .AddAuthenticationInternal(configuration)
+            .AddAuthenticationInternal(configuration, isDevelopment)
             .AddAuthorizationInternal();
 
     private static IServiceCollection AddServices(this IServiceCollection services,  IConfiguration configuration)
@@ -95,7 +96,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddAuthenticationInternal(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration, bool isDevelopment)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(o =>
@@ -125,12 +126,17 @@ public static class DependencyInjection
 
         services.Configure<CookiePolicyOptions>(options =>
         {
-            options.MinimumSameSitePolicy = SameSiteMode.None; 
+            options.MinimumSameSitePolicy = SameSiteMode.None;             
             options.OnAppendCookie = cookieContext =>
             {
                 cookieContext.CookieOptions.Secure = true;
                 cookieContext.CookieOptions.HttpOnly = true;
                 cookieContext.CookieOptions.SameSite = SameSiteMode.None;
+
+                if (!isDevelopment)
+                {
+                    cookieContext.CookieOptions.Domain = ".openprojects.com.br";
+                }
             };
         });
 
