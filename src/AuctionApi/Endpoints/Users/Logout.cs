@@ -4,7 +4,7 @@ internal sealed class Logout : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("users/logout", async (HttpContext context, CancellationToken cancellationToken) =>
+        app.MapPost("users/logout", (HttpContext context, CancellationToken cancellationToken) =>
         {
             var cookieOptions = new CookieOptions
             {            
