@@ -14,18 +14,39 @@ public class RefreshToken : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("users/refresh-token", async (
-            Request request,
+            HttpContext context,
             ICommandHandler<RefreshTokenCommand, RefreshTokenResponse> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new RefreshTokenCommand(request.Token, request.RefreshToken);
+            string token = context.Request.Cookies["auth-token"];
+            string refreshToken = context.Request.Cookies["refresh-token"];
+
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return Results.Unauthorized();
+            }                
+
+            var command = new RefreshTokenCommand(token ?? "", refreshToken);
 
             Result<RefreshTokenResponse> result = await handler.Handle(command, cancellationToken);
 
-            return result.Match(Results.Ok, CustomResults.Problem);
-        })
-        .WithTags(Tags.Users)
-        .AllowAnonymous();
+            return result.Match(
+             response =>
+             {
+                 var cookieOptions = new CookieOptions
+                 {
+                     Expires = DateTimeOffset.UtcNow.AddDays(7),
+                     Path = "/"
+                 };
 
+                 context.Response.Cookies.Append("auth-token", response.Token, cookieOptions);
+                 context.Response.Cookies.Append("refresh-token", response.RefreshToken, cookieOptions);
+
+                 return Results.Ok(new { message = "Tokens atualizados com sucesso" });
+             },
+             error => CustomResults.Problem(error)
+         );
+        }).WithTags(Tags.Users)
+         .AllowAnonymous();
     }
 }
