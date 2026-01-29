@@ -14,6 +14,8 @@ using Infrastructure.ExternalServices;
 using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -111,15 +113,26 @@ public static class DependencyInjection
                     OnMessageReceived = context =>
                     {
                         string accessToken = context.Request.Query["access_token"];
-                        if (!string.IsNullOrEmpty(accessToken) &&
-                            context.HttpContext.Request.Path.StartsWithSegments("/auctionHub"))
-                        {
-                            context.Token = accessToken;
-                        }
+                        context.Token = !string.IsNullOrEmpty(accessToken) &&
+                            context.HttpContext.Request.Path.StartsWithSegments("/auctionHub")
+                            ? accessToken
+                            : context.Request.Cookies["auth-token"];
                         return Task.CompletedTask;
+
                     }
                 };
             });
+
+        services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.MinimumSameSitePolicy = SameSiteMode.None; 
+            options.OnAppendCookie = cookieContext =>
+            {
+                cookieContext.CookieOptions.Secure = true;
+                cookieContext.CookieOptions.HttpOnly = true;
+                cookieContext.CookieOptions.SameSite = SameSiteMode.None;
+            };
+        });
 
         services.AddHttpContextAccessor();
 

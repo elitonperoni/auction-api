@@ -10,11 +10,7 @@ using SharedKernel;
 namespace AuctionApi.Endpoints.AuctionBid;
 
 public class List : IEndpoint
-{
-    public sealed class Request
-    {
-
-    }
+{    
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("auctions/list", async (
@@ -27,7 +23,6 @@ public class List : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Auction)
-        .RequireAuthorization();
+        .WithTags(Tags.Auction);
     }
 }
