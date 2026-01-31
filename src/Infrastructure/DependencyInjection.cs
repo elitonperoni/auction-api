@@ -135,7 +135,7 @@ public static class DependencyInjection
 
                 if (!isDevelopment)
                 {
-                    cookieContext.CookieOptions.Domain = ".openprojects.com.br";
+                    cookieContext.CookieOptions.Domain = configuration["SecretsApi:Domain"]; 
                 }
             };
         });
