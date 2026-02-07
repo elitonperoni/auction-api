@@ -4,6 +4,7 @@ using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
+using SharedKernel.Consts;
 
 namespace AuctionApi.Endpoints.Users;
 
@@ -32,8 +33,8 @@ internal sealed class Login : IEndpoint
                         Expires = DateTime.UtcNow.AddDays(7)
                     };
 
-                    context.Response.Cookies.Append("auth-token", response.Token, cookieOptions);
-                    context.Response.Cookies.Append("refresh-token", response.RefreshToken, cookieOptions);
+                    context.Response.Cookies.Append(TokenConsts.AuthToken, response.Token, cookieOptions);
+                    context.Response.Cookies.Append(TokenConsts.RefreshToken, response.RefreshToken, cookieOptions);
 
                     return Results.Ok(new { response.Id, response.Name });
                 },

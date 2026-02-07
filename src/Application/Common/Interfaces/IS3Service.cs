@@ -10,7 +10,7 @@ namespace Application.Common.Interfaces;
 public interface IS3Service
 {
     Task<bool> DeleteFile(string key);
-    Uri GeneratePublicURL(string chaveObjeto);
+    Uri BuildPublicUri(string chaveObjeto);
     Uri GenerateURL(string key);
     Task<Result<byte[]>> GetFileByKey(string key);
     Task<bool> SaveFile(byte[] file, string key, string contentType, bool cannedACL = false);

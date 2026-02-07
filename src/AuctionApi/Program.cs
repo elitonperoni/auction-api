@@ -32,6 +32,7 @@ builder.Services
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<BidProcessedConsumer>();
+    x.AddConsumer<NotificationConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {

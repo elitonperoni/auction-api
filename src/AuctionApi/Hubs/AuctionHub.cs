@@ -26,7 +26,12 @@ public class AuctionHub(IPublishEndpoint publishEndpoint) : Hub
             return;
         }
 
-        await publishEndpoint.Publish(new BidPlaced(Guid.Parse(groupName), userId.Value, bidAmount, DateTime.UtcNow));
+        await publishEndpoint.Publish(
+            new BidPlaced(
+                Context?.ConnectionId?.ToString() ?? "",
+                Guid.Parse(groupName), 
+                userId.Value, bidAmount, 
+                DateTime.UtcNow));
 
         //await LoadTest(bidAmount, groupName, userId.Value);        
     }

@@ -12,6 +12,7 @@ using Application.Enums;
 using Application.Extensions;
 using Application.Todos.Get;
 using Domain.Auction;
+using Domain.Interfaces;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -19,7 +20,7 @@ using SharedKernel;
 namespace Application.AuctionUseCases.GetDetail;
 
 internal sealed class GetDetailProductQueryHandler(
-    IS3Service s3Service,
+    IAuctionService auctionService,
     IApplicationDbContext context) 
     : IQueryHandler<GetDetailProductQuery, GetDetailProductResponse>
 {
@@ -48,7 +49,7 @@ internal sealed class GetDetailProductQueryHandler(
         List<string> photosUrls = [];
         if (auctionDb.Photos != null && auctionDb.Photos.Any())
         {
-            photosUrls = CreateResponsePhotosUrls(auctionDb.Photos);
+            photosUrls = auctionService.CreateResponsePhotosUrls(auctionDb.Photos);
         }     
 
         var response = new GetDetailProductResponse
@@ -75,16 +76,5 @@ internal sealed class GetDetailProductQueryHandler(
         };
 
         return Result.Success(response);
-    }
-
-    private List<string> CreateResponsePhotosUrls(IEnumerable<ProductPhoto> photos)
-    {
-        List<string> photoUrls = new();
-        foreach (ProductPhoto photo in photos)
-        {
-            Uri photoUrl = s3Service.GeneratePublicURL($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{photo.AuctionId.ToString()}/{photo.Name}");
-            photoUrls.Add(photoUrl.ToString());
-        }
-        return photoUrls;
     }
 }

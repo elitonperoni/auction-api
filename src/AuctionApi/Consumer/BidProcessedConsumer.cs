@@ -17,7 +17,7 @@ public class BidProcessedConsumer : IConsumer<BidProcessedEvent>
     public async Task Consume(ConsumeContext<BidProcessedEvent> context)
     {
         BidProcessedEvent bidResult = context.Message;
-        
+       
         await _hubContext.Clients.Group(bidResult.AuctionId.ToString())
             .SendAsync(ChannelNames.ReceiveNewBid,
                 bidResult.AuctionId,

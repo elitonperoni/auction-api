@@ -4,6 +4,7 @@ using Application.Users.RefreshToken;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;
+using SharedKernel.Consts;
 
 namespace AuctionApi.Endpoints.Users;
 
@@ -18,15 +19,15 @@ public class RefreshToken : IEndpoint
             ICommandHandler<RefreshTokenCommand, RefreshTokenResponse> handler,
             CancellationToken cancellationToken) =>
         {
-            string token = context.Request.Cookies["auth-token"];
-            string refreshToken = context.Request.Cookies["refresh-token"];
+            string token = context.Request.Cookies[TokenConsts.AuthToken];
+            string refreshToken = context.Request.Cookies[TokenConsts.RefreshToken];
 
-            if (string.IsNullOrEmpty(refreshToken))
+            if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(token))
             {
                 return Results.Unauthorized();
             }                
 
-            var command = new RefreshTokenCommand(token ?? "", refreshToken);
+            var command = new RefreshTokenCommand(token, refreshToken);
 
             Result<RefreshTokenResponse> result = await handler.Handle(command, cancellationToken);
 
@@ -39,8 +40,8 @@ public class RefreshToken : IEndpoint
                      Path = "/"
                  };
 
-                 context.Response.Cookies.Append("auth-token", response.Token, cookieOptions);
-                 context.Response.Cookies.Append("refresh-token", response.RefreshToken, cookieOptions);
+                 context.Response.Cookies.Append(TokenConsts.AuthToken, response.Token, cookieOptions);
+                 context.Response.Cookies.Append(TokenConsts.RefreshToken, response.RefreshToken, cookieOptions);
 
                  return Results.Ok(new { message = "Tokens atualizados com sucesso" });
              },

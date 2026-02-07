@@ -11,11 +11,13 @@ public class Create : IEndpoint
 {
     public sealed class Request
     {
+        public Guid? Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime EndDate { get; set; }
         public decimal StartingPrice { get; set; }
-        public IFormFileCollection Images { get; set; }
+        public IFormFileCollection NewImages { get; set; }
+        public List<string>? ImagesToRemove { get; set; }
     }
 
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -25,7 +27,7 @@ public class Create : IEndpoint
             ICommandHandler<CreateAuctionCommand, Guid> handler,
             CancellationToken cancellationToken) =>
         {
-            var imageModels = request.Images.Select(file =>
+            var imageModels = request.NewImages.Select(file =>
                 new FileInput(
                     file.OpenReadStream(),
                     file.FileName,
@@ -34,11 +36,13 @@ public class Create : IEndpoint
 
             var command = new CreateAuctionCommand
             {
+                Id = request.Id,
                 Title = request.Title,
                 Description = request.Description,
                 EndDate = request.EndDate,
                 StartingPrice = request.StartingPrice,
-                ImageStreams = imageModels,
+                NewImages = imageModels,
+                ImagesToRemove = request.ImagesToRemove
             };
 
             Result<Guid> result = await handler.Handle(command, cancellationToken);

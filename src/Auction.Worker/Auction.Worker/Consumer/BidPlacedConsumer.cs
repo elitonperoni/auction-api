@@ -7,19 +7,11 @@ using SharedKernel;
 namespace Auction.Worker.Consumer;
 
 public class BidPlacedConsumer(ICommandHandler<SendBidCommand, SendBidDtoResponse> handler,
-    ILogger<BidPlacedConsumer> logger,
     IPublishEndpoint publishEndpoint) : 
     IConsumer<BidPlaced>
 {
     public async Task Consume(ConsumeContext<BidPlaced> context)
-    {
-        string workerId = Environment.MachineName;
-        decimal bidAmount = context.Message.Amount;
-        Guid auctionId = context.Message.AuctionId;
-
-        logger.LogInformation("[Worker:{Id}] Processando lance de {Valor} para o leilão {AuctionId}",
-                workerId, bidAmount, auctionId);
-
+    {      
         var command = new SendBidCommand()
         {
             AuctionId = context.Message.AuctionId,
@@ -31,8 +23,10 @@ public class BidPlacedConsumer(ICommandHandler<SendBidCommand, SendBidDtoRespons
 
         if (responseBid.IsFailure)
         {
-            logger.LogWarning("[Worker:{Id}] LANCE REJEITADO: Valor {Valor} | Motivo: {Reason}",
-                workerId, bidAmount, responseBid.Error.Description);
+            await publishEndpoint.Publish(new NotificationEvent(
+               context.Message.CallerId.ToString(),
+               responseBid.Error.Description),
+               context.CancellationToken);
             return;
         }
 
