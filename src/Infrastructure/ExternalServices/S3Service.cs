@@ -49,7 +49,7 @@ public class S3Service(IAmazonS3 s3Client, IOptions<AwsConfig> awsOptions) : IS3
         return new Uri($"https://{awsOptions.Value.BucketName}.s3.{awsOptions.Value.Region}.amazonaws.com/{key}");
     }
 
-    public Uri GeneratePublicURL(string chaveObjeto)
+    public Uri BuildPublicUri(string chaveObjeto)
     {
         var request = new GetPreSignedUrlRequest
         {

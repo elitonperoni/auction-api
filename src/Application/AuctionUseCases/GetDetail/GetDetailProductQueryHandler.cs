@@ -82,7 +82,7 @@ internal sealed class GetDetailProductQueryHandler(
         List<string> photoUrls = new();
         foreach (ProductPhoto photo in photos)
         {
-            Uri photoUrl = s3Service.GeneratePublicURL($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{photo.AuctionId.ToString()}/{photo.Name}");
+            Uri photoUrl = s3Service.BuildPublicUri($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{photo.AuctionId.ToString()}/{photo.Name}");
             photoUrls.Add(photoUrl.ToString());
         }
         return photoUrls;

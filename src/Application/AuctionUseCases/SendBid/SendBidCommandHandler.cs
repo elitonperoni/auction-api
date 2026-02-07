@@ -33,6 +33,12 @@ public class SendBidCommandHandler(
                     Error.Failure("Bid.Invalid", $"Produto não encontrado"));
             }
 
+            if (auction.EndDate < DateTime.UtcNow)
+            {
+                return Result.Failure<SendBidDtoResponse>(
+                    Error.Failure("Bid.Invalid", $"Leilão encerrado"));
+            }
+
             if (command.BidPrice <= auction.CurrentPrice)
             {
                 return Result.Failure<SendBidDtoResponse>(
