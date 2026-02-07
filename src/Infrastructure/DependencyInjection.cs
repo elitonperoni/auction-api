@@ -5,7 +5,9 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Mail;
 using Application.Common.Interfaces;
 using Application.Mail;
+using Application.Services;
 using Domain.Configurations;
+using Domain.Interfaces;
 using Infrastructure.Authentication;
 using Infrastructure.Authorization;
 using Infrastructure.Database;
@@ -57,6 +59,9 @@ public static class DependencyInjection
         var region = Amazon.RegionEndpoint.GetBySystemName(awsSection["Region"] ?? "us-east-2");
 
         services.AddSingleton<IAmazonS3>(sp => new AmazonS3Client(credentials, region));
+
+        services.AddScoped<IS3Service, S3Service>();
+        services.AddScoped<IAuctionService, AuctionService>();
 
         return services;
     }
@@ -135,8 +140,7 @@ public static class DependencyInjection
         services.AddSingleton<ITokenProvider, TokenProvider>();
         services.AddSingleton<IMailSender, MailSender>();
 
-        services.AddScoped<IUserContext, UserContext>();
-        services.AddScoped<IS3Service, S3Service>();  
+        services.AddScoped<IUserContext, UserContext>();        
 
         return services;
     }

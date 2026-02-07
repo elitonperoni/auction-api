@@ -21,6 +21,7 @@ public sealed class ApplicationDbContext(
     public DbSet<TodoItem> TodoItems { get; set; }
     public DbSet<Auction> Auctions { get; set; }
     public DbSet<Bid> Bids { get; set; }
+    public DbSet<ProductPhoto> ProductPhotos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -12,6 +12,7 @@ public interface IApplicationDbContext
     DbSet<User> Users { get; }
     DbSet<TodoItem> TodoItems { get; }
     DbSet<Auction> Auctions { get; }
+    DbSet<ProductPhoto> ProductPhotos { get; }
     DbSet<Bid> Bids { get; }
 
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

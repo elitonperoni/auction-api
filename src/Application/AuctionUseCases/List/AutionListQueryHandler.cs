@@ -2,6 +2,8 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Common.Interfaces;
+using Application.Enums;
+using Application.Extensions;
 using Application.Pagination;
 using Domain.Auction;
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +25,13 @@ internal sealed class AutionListQueryHandler(
         {
             Id = p.Id,
             CurrentPrice = p.CurrentPrice,
+            StartingPrice = p.StartingPrice,
             Title = p.Title,
             BidCount = p.BidCount,
             EndDate = p.EndDate,
+            Seller = p.User?.FirstName ?? "",
             ImageUrl = p.Photos?.Any() is true
-            ? s3Service.BuildPublicUri($"auction-product-photos/{p.Id}/{p.Photos?.FirstOrDefault()?.Name}").ToString()
+            ? s3Service.BuildPublicUri($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{p.Id}/{p.Photos?.FirstOrDefault()?.Name}").ToString()
             : ""
         }).ToList();
         
@@ -37,7 +41,9 @@ internal sealed class AutionListQueryHandler(
     {
         IQueryable<Auction> auctionQuery = context.Auctions
                     .Where(p => p.EndDate >= DateTime.UtcNow)
-                    .Include(p => p.Photos).AsQueryable();
+                    .Include(p => p.Photos)
+                    .Include(p => p.User)
+                    .AsQueryable();
 
         if (!string.IsNullOrEmpty(query.SearchTerm))
         {

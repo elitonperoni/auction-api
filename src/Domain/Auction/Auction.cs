@@ -30,6 +30,9 @@ public sealed class Auction : Entity
     public Guid UserId { get; set; }
     public Guid? LastBidderId { get; set; }
     public User? User { get; set; }
+
+    [ForeignKey(nameof(LastBidderId))]
+    public User? LastBidder { get; set; }
     public ICollection<Bid>? Bids { get; set; } = [];
     public ICollection<ProductPhoto>? Photos { get; set; } = [];
 }

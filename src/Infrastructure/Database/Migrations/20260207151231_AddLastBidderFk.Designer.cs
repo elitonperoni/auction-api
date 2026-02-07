@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260207151231_AddLastBidderFk")]
+    partial class AddLastBidderFk
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,12 +148,12 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnName("name");
 
                     b.HasKey("Id")
-                        .HasName("pk_product_photos");
+                        .HasName("pk_product_photo");
 
                     b.HasIndex("AuctionId")
-                        .HasDatabaseName("ix_product_photos_auction_id");
+                        .HasDatabaseName("ix_product_photo_auction_id");
 
-                    b.ToTable("product_photos", "public");
+                    b.ToTable("product_photo", "public");
                 });
 
             modelBuilder.Entity("Domain.Todos.TodoItem", b =>
@@ -303,7 +306,7 @@ namespace Infrastructure.Database.Migrations
                         .HasForeignKey("AuctionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_product_photos_auctions_auction_id");
+                        .HasConstraintName("fk_product_photo_auctions_auction_id");
 
                     b.Navigation("Auction");
                 });
