@@ -37,6 +37,7 @@ public class BidPlacedConsumer(ICommandHandler<SendBidCommand, SendBidDtoRespons
 
         await notificationCacheService.AddNotificationAsync(responseBid.Value.AuctionOwnerId, new NotificationItem()
         {
+            AuctionId = command.AuctionId,
             Message = responseBid.Value.MessageToOwner
         });
 
