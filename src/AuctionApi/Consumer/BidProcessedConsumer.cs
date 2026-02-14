@@ -27,5 +27,11 @@ public class BidProcessedConsumer : IConsumer<BidProcessedEvent>
                 bidResult.LastBidderNamer,
                 DateTime.UtcNow, 
                 context.CancellationToken);
+
+        await _hubContext.Clients.Group(bidResult.AuctionOwnerId.ToString())
+            .SendAsync(ChannelNames.ReceiveUserNotification,
+                bidResult.AuctionId,
+                bidResult.MessageToOwner,
+                context.CancellationToken);
     }
 }

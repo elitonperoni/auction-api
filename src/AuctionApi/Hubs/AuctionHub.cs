@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Domain.Events;
-using Domain.Users;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -56,6 +55,11 @@ public class AuctionHub(IPublishEndpoint publishEndpoint) : Hub
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         await Clients.Caller.SendAsync("ReceiveMessage", "AuctionHub", $"Você entrou no leilão: {groupName}");
+    }
+
+    public async Task JoinUserGroup(string groupName)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, groupName);        
     }
 
     public async Task SyncAuctionState(string auctionId)

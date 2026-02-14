@@ -28,6 +28,8 @@ builder.Services
         builder.Configuration, 
         builder.Environment.IsDevelopment());
 
+builder.Services.AddCaching(builder.Configuration);
+
 
 builder.Services.AddMassTransit(x =>
 {

@@ -3,13 +3,14 @@ using Amazon.S3;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Mail;
-using Application.Common.Interfaces;
+using Application.AuctionUseCases.Services;
+using Application.Interfaces;
 using Application.Mail;
-using Application.Services;
 using Domain.Configurations;
 using Domain.Interfaces;
 using Infrastructure.Authentication;
 using Infrastructure.Authorization;
+using Infrastructure.Caching;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.ExternalServices;
@@ -25,6 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel;
 using SharedKernel.Consts;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -62,6 +64,23 @@ public static class DependencyInjection
 
         services.AddScoped<IS3Service, S3Service>();
         services.AddScoped<IAuctionService, AuctionService>();
+
+        return services;
+    }
+    public static IServiceCollection AddCaching(this IServiceCollection services, IConfiguration configuration)
+    {
+        string? redisConnectionString = configuration.GetConnectionString("RedisConnection");
+
+        if (string.IsNullOrEmpty(redisConnectionString))
+        {
+            throw new Exception("ALERTA: A Connection String 'RedisConnection' não foi encontrada no appsettings.json!");
+        }
+       
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+            ConnectionMultiplexer.Connect(redisConnectionString)
+        );
+
+        services.AddScoped<INotificationCacheService, NotificationCacheService>();
 
         return services;
     }
