@@ -9,6 +9,8 @@ services:
     ports:
       - 5000:8080
       - 5001:8081
+    environment:
+      - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false
     networks:
       - auction-network
 
@@ -34,6 +36,7 @@ services:
       - MT_LICENSE=Community   
       - DOTNET_ENVIRONMENT=Development
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false
     depends_on:
       - rabbitmq         
     networks:
@@ -46,6 +49,15 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - 8081:80
+    networks:
+      - auction-network
+    
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
     networks:
       - auction-network
 

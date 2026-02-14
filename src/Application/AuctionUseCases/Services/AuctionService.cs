@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.Common.Interfaces;
 using Application.Enums;
 using Application.Extensions;
+using Application.Interfaces;
 using Domain.Auction;
 using Domain.Interfaces;
 
-namespace Application.Services;
+namespace Application.AuctionUseCases.Services;
 
 public class AuctionService(IS3Service s3Service) : IAuctionService
 {

@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Abstractions.Data;
+﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.AuctionUseCases.GetDetail;
-using Application.Common.Interfaces;
-using Application.Enums;
-using Application.Extensions;
 using Domain.Auction;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;

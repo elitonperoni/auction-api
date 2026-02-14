@@ -15,6 +15,7 @@ public sealed class GetDetailProductResponse
     public decimal MinBid { get; set; }
     public int BidsCounts { get; set; }
     public string Category { get; set; }
+    public bool IsOwner { get; set; }
     public string Seller { get; set; }
     public string Condition { get; set; }
     public string Location { get; set; }

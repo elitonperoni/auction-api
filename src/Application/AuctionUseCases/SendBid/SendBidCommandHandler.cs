@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using Domain.Auction;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -64,12 +65,16 @@ public class SendBidCommandHandler(
 
             User? user = await context.Users.AsNoTracking().SingleOrDefaultAsync(p => p.Id == command.UserId, cancellationToken);
 
+            string messageToOwner = $"Você recebeu um novo lance no item {auction.Title}";
+         
             return Result.Success(new SendBidDtoResponse
             {
                 AuctionId = auctionBid.AuctionId,
                 LastBidderId = command.UserId,
                 LastBidderNamer = user?.FirstName ?? "",
                 TotalBids = auction.BidCount,
+                AuctionOwnerId = auction.UserId,
+                MessageToOwner = messageToOwner,
                 Date = auctionBid.BidDate,
                 Amount = auctionBid.Amount
             });
@@ -80,7 +85,7 @@ public class SendBidCommandHandler(
             throw;
         }
         catch (Exception)
-        {
+        {            
             await transaction.RollbackAsync(cancellationToken);
             throw;
         }

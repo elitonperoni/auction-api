@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Abstractions.Authentication;
+﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Common.Interfaces;
-using Application.Enums;
-using Application.Extensions;
-using Application.Todos.Get;
 using Domain.Auction;
 using Domain.Interfaces;
-using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -21,6 +10,7 @@ namespace Application.AuctionUseCases.GetDetail;
 
 internal sealed class GetDetailProductQueryHandler(
     IAuctionService auctionService,
+    IUserContext userContext,
     IApplicationDbContext context) 
     : IQueryHandler<GetDetailProductQuery, GetDetailProductResponse>
 {
@@ -50,7 +40,9 @@ internal sealed class GetDetailProductQueryHandler(
         if (auctionDb.Photos != null && auctionDb.Photos.Any())
         {
             photosUrls = auctionService.CreateResponsePhotosUrls(auctionDb.Photos);
-        }     
+        }
+
+        Guid currentUserId = userContext.UserId;
 
         var response = new GetDetailProductResponse
         {
@@ -61,6 +53,7 @@ internal sealed class GetDetailProductQueryHandler(
             MinBid = bids.Any() ? Math.Round(bids.Max(p => p?.Amount) * 1.1M ?? 0, 0) : 0,
             BidsCounts = auctionDb.BidCount,
             Category = "Diversos",
+            IsOwner = auctionDb.User?.Id == currentUserId,
             Seller = auctionDb.User?.FirstName ?? "",
             Condition = "Novo",
             Location = "Curitiba, Paraná",

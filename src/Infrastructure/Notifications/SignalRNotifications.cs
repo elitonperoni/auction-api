@@ -1,7 +1,4 @@
-﻿using Application.Common.Interfaces;
-using Microsoft.AspNetCore.SignalR;
-
-//namespace Infrastructure.Notifications;
+﻿//namespace Infrastructure.Notifications;
 
 //public class SignalRNotifications : IAuctionNotifier
 //{

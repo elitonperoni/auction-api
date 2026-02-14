@@ -1,12 +1,17 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.AuctionUseCases.SendBid;
+using Application.DTOs;
+using Application.Interfaces;
+using Domain.Auction;
 using Domain.Events;
+using Infrastructure.Caching;
 using MassTransit;
 using SharedKernel;
 
 namespace Auction.Worker.Consumer;
 
 public class BidPlacedConsumer(ICommandHandler<SendBidCommand, SendBidDtoResponse> handler,
+    INotificationCacheService notificationCacheService,
     IPublishEndpoint publishEndpoint) : 
     IConsumer<BidPlaced>
 {
@@ -30,12 +35,19 @@ public class BidPlacedConsumer(ICommandHandler<SendBidCommand, SendBidDtoRespons
             return;
         }
 
+        await notificationCacheService.AddNotificationAsync(responseBid.Value.AuctionOwnerId, new NotificationItem()
+        {
+            Message = responseBid.Value.MessageToOwner
+        });
+
         await publishEndpoint.Publish(new BidProcessedEvent(
             responseBid.Value.AuctionId,
             responseBid.Value.Amount,
             responseBid.Value.TotalBids,
             responseBid.Value.LastBidderId,
             responseBid.Value.LastBidderNamer,
+            responseBid.Value.AuctionOwnerId,
+            responseBid.Value.MessageToOwner,
             responseBid.Value.Date),
             context.CancellationToken);
     }

@@ -1,9 +1,9 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Common.Interfaces;
 using Application.Enums;
 using Application.Extensions;
+using Application.Interfaces;
 using Domain.Auction;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;

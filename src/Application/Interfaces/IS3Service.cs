@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharedKernel;
 
-namespace Application.Common.Interfaces;
+namespace Application.Interfaces;
 
 public interface IS3Service
 {

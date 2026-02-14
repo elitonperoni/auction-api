@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Amazon;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
-using Application.Common.Interfaces;
+using Application.Interfaces;
 using Domain.Configurations;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SharedKernel;
 
