@@ -10,7 +10,7 @@ using Application.AuctionUseCases.ListByUserId;
 using Application.Enums;
 using Application.Extensions;
 using Application.Interfaces;
-using Domain.Auction;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -33,7 +33,7 @@ internal sealed class AuctionBidsByUserQueryHandler(
             Id = p.Id,
             CurrentPrice = p.CurrentPrice,
             UserLastBidAmount = p.Bids?.Max(p => p.Amount) ?? 0,
-            Title = p.Title,
+            Title = p.Title ?? "",
             BidCount = p.BidCount,
             EndDate = p.EndDate,
             ImageUrl = p.Photos?.Any() is true

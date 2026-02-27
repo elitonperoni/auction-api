@@ -4,6 +4,7 @@ using Application.Abstractions.Messaging;
 using Application.Extensions;
 using Application.Mail;
 using Domain.Configurations;
+using Domain.Entities;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

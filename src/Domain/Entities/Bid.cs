@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domain.Users;
 using SharedKernel;
 
-namespace Domain.Auction;
+namespace Domain.Entities;
 
 public sealed class Bid : Entity
 {

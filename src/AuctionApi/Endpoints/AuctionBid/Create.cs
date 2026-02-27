@@ -16,6 +16,10 @@ public class Create : IEndpoint
         public string Description { get; set; }
         public DateTime EndDate { get; set; }
         public decimal StartingPrice { get; set; }
+        public int ConditionProductId { get; set; }
+        public int ConditionPackagingId { get; set; }
+        public int CategoryProductId { get; set; }
+        public bool WithoutWarranty { get; set; }
         public IFormFileCollection NewImages { get; set; }
         public List<string>? ImagesToRemove { get; set; }
     }
@@ -41,6 +45,10 @@ public class Create : IEndpoint
                 Description = request.Description,
                 EndDate = request.EndDate,
                 StartingPrice = request.StartingPrice,
+                ConditionProductId = request.ConditionProductId,
+                ConditionPackagingId = request.ConditionPackagingId,
+                CategoryProductId = request.CategoryProductId,
+                WithoutWarranty = request.WithoutWarranty,
                 NewImages = imageModels,
                 ImagesToRemove = request.ImagesToRemove
             };

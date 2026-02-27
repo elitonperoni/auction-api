@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Domain.Auction;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -35,8 +35,8 @@ internal sealed class GetRegisterDetailQueryHandler(
         {
             Id = auctionDb.Id,
             Title = auctionDb.Title,
-            Description = auctionDb.Description,
-            InitialValue = auctionDb.StartingPrice,
+            Description = auctionDb.ProductDetail?.Description ?? "",
+            InitialValue = auctionDb.ProductDetail?.StartingPrice ?? 0,
             EndDate = auctionDb.EndDate,
             Photos = photosUrls
         };

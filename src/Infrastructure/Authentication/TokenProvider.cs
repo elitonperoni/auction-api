@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Application.Abstractions.Authentication;
-using Domain.Users;
+using Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;

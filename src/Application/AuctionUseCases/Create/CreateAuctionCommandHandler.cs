@@ -4,7 +4,7 @@ using Application.Abstractions.Messaging;
 using Application.Enums;
 using Application.Extensions;
 using Application.Interfaces;
-using Domain.Auction;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -31,14 +31,21 @@ public class CreateAuctionCommandHandler(
         Guid userId = userContext.UserId;
 
         Auction auction = new()
-        {
-            Title = command.Title,
-            Description = command.Description,
-            StartDate = DateTime.UtcNow,
-            EndDate = command.EndDate,
-            StartingPrice = command.StartingPrice,
+        {            
             CurrentPrice = command.StartingPrice,
             UserId = userId,
+            Title = command.Title,
+            StartDate = DateTime.UtcNow,
+            EndDate = command.EndDate,
+            ProductDetail = new ProductDetail()
+            {                
+                Description = command.Description,                               
+                StartingPrice = command.StartingPrice,
+                ConditionProductId = command.ConditionProductId,
+                ConditionPackagingId = command.ConditionPackagingId,
+                CategoryProductId = command.CategoryProductId,
+                WithoutWarranty = command.WithoutWarranty,
+            }
         };
 
         await context.Auctions.AddAsync(auction, cancellationToken);
@@ -57,6 +64,7 @@ public class CreateAuctionCommandHandler(
 
         Auction? auction = await context.Auctions
             .Include(p => p.Photos)
+            .Include(p => p.ProductDetail)
             .SingleOrDefaultAsync(c => c.Id == command.Id && c.UserId == userId, cancellationToken);
 
         if (auction is null)
@@ -64,9 +72,15 @@ public class CreateAuctionCommandHandler(
             return Guid.Empty;
         }
 
-        auction.Title = command.Title;
-        auction.Description = command.Description;
-        auction.EndDate = command.EndDate;
+        if (auction.ProductDetail is not null)
+        {
+            auction.Title = command.Title;
+            auction.ProductDetail.Description = command.Description;
+            auction.EndDate = command.EndDate;
+            auction.ProductDetail.ConditionProductId = command.ConditionProductId;
+            auction.ProductDetail.ConditionPackagingId = command.ConditionPackagingId;
+            auction.ProductDetail.WithoutWarranty = command.WithoutWarranty;
+        }
 
         if (command.ImagesToRemove?.Any() is true)
         {

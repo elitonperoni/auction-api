@@ -7,9 +7,11 @@ using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.AuctionUseCases.List;
+using Application.Enums;
+using Application.Extensions;
 using Application.Interfaces;
 using Application.Pagination;
-using Domain.Auction;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -30,11 +32,11 @@ internal sealed class AuctionListByUserIdHandler(
         {
             Id = p.Id,
             CurrentPrice = p.CurrentPrice,
-            Title = p.Title,
+            Title = p.Title ?? string.Empty,
             BidCount = p.BidCount,
             EndDate = p.EndDate,
             ImageUrl = p.Photos?.Any() is true
-            ? s3Service.BuildPublicUri($"auction-product-photos/{p.Id}/{p.Photos?.FirstOrDefault()?.Name}").ToString()
+            ? s3Service.BuildPublicUri($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{p.Id}/{p.Photos?.FirstOrDefault()?.Name}").ToString()
             : "",
             ActualWinner = !string.IsNullOrEmpty(p.LastBidder?.FirstName) ? $"@{p.LastBidder?.FirstName}" : null,
             Status = p.EndDate > DateTime.UtcNow ? "Ativo" : "Finalizado"

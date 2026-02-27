@@ -14,6 +14,10 @@ public class CreateAuctionCommand : ICommand<Guid>
     public string Description { get; set; }
     public DateTime EndDate { get; set; }
     public decimal StartingPrice { get; set; }
+    public int ConditionProductId { get; set; }
+    public int ConditionPackagingId { get; set; }
+    public int CategoryProductId { get; set; }
+    public bool WithoutWarranty { get; set; }
     public List<FileInput> NewImages { get; set; }
     public List<string>? ImagesToRemove { get; set; }
 }

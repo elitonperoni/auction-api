@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.AuctionUseCases.SendBid;
-using Application.Users.Login;
-using Domain.Auction;
-using Domain.Users;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 

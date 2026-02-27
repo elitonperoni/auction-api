@@ -2,9 +2,7 @@
 using Application.AuctionUseCases.SendBid;
 using Application.DTOs;
 using Application.Interfaces;
-using Domain.Auction;
 using Domain.Events;
-using Infrastructure.Caching;
 using MassTransit;
 using SharedKernel;
 

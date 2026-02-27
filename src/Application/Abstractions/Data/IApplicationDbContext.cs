@@ -1,6 +1,5 @@
-﻿using Domain.Auction;
+﻿using Domain.Entities;
 using Domain.Todos;
-using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;

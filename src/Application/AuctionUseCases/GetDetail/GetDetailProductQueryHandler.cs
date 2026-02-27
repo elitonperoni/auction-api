@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Domain.Auction;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -48,7 +48,7 @@ internal sealed class GetDetailProductQueryHandler(
         {
             Id = auctionDb.Id,
             Title = auctionDb.Title,
-            Description = auctionDb.Description,
+            Description = auctionDb.ProductDetail?.Description ?? "",
             CurrentBid = auctionDb.CurrentPrice,
             MinBid = bids.Any() ? Math.Round(bids.Max(p => p?.Amount) * 1.1M ?? 0, 0) : 0,
             BidsCounts = auctionDb.BidCount,

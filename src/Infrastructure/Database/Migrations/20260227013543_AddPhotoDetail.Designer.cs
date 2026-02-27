@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260227013543_AddPhotoDetail")]
+    partial class AddPhotoDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,26 +124,6 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("bids", "public");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CategoryProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_category_product");
-
-                    b.ToTable("category_product", "public");
-                });
-
             modelBuilder.Entity("Domain.Entities.ConditionPackaging", b =>
                 {
                     b.Property<int>("Id")
@@ -215,9 +198,6 @@ namespace Infrastructure.Database.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_product_detail");
-
-                    b.HasIndex("CategoryProductId")
-                        .HasDatabaseName("ix_product_detail_category_product_id");
 
                     b.HasIndex("ConditionPackagingId")
                         .HasDatabaseName("ix_product_detail_condition_packaging_id");
@@ -412,13 +392,6 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Entities.ProductDetail", b =>
                 {
-                    b.HasOne("Domain.Entities.CategoryProduct", "CategoryProduct")
-                        .WithMany()
-                        .HasForeignKey("CategoryProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_product_detail_category_product_category_product_id");
-
                     b.HasOne("Domain.Entities.ConditionPackaging", "ConditionPackaging")
                         .WithMany()
                         .HasForeignKey("ConditionPackagingId")
@@ -432,8 +405,6 @@ namespace Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_product_detail_condition_product_condition_product_id");
-
-                    b.Navigation("CategoryProduct");
 
                     b.Navigation("ConditionPackaging");
 

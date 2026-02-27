@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Entities;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
