@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Application.Enums;
 using Application.Extensions;
 using Application.Interfaces;
-using Domain.Auction;
+using Domain.Entities;
 using Domain.Interfaces;
 
 namespace Application.AuctionUseCases.Services;

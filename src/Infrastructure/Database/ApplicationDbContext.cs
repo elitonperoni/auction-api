@@ -1,8 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Domain;
-using Domain.Auction;
+using Domain.Entities;
 using Domain.Todos;
-using Domain.Users;
 using Infrastructure.DomainEvents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;

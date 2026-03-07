@@ -1,7 +1,8 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Domain.Auction;
+using Application.Extensions.Entities;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -21,6 +22,12 @@ internal sealed class GetDetailProductQueryHandler(
             .Where(auction => auction.Id == query.Id)
             .Include(p => p.User)
             .Include(p => p.Photos)
+            .Include(p => p.ProductDetail)
+                .ThenInclude(p => p!.CategoryProduct)
+            .Include(p => p.ProductDetail)
+                .ThenInclude(p => p!.ConditionProduct)
+            .Include(p => p.ProductDetail)
+                .ThenInclude(p => p!.ConditionPackaging)
             .SingleOrDefaultAsync(cancellationToken);        
 
         if (auctionDb is null)
@@ -48,15 +55,17 @@ internal sealed class GetDetailProductQueryHandler(
         {
             Id = auctionDb.Id,
             Title = auctionDb.Title,
-            Description = auctionDb.Description,
+            Description = auctionDb.ProductDetail?.Description ?? "",
             CurrentBid = auctionDb.CurrentPrice,
             MinBid = bids.Any() ? Math.Round(bids.Max(p => p?.Amount) * 1.1M ?? 0, 0) : 0,
-            BidsCounts = auctionDb.BidCount,
-            Category = "Diversos",
+            BidsCounts = auctionDb.BidCount,            
             IsOwner = auctionDb.User?.Id == currentUserId,
             Seller = auctionDb.User?.FirstName ?? "",
-            Condition = "Novo",
-            Location = "Curitiba, Paraná",
+            Category = auctionDb.ProductDetail?.CategoryProduct?.Name ?? "",
+            ConditionProduct = auctionDb.ProductDetail?.ConditionProduct?.Name ?? "",
+            ConditionPackaging = auctionDb.ProductDetail?.ConditionPackaging?.Name ?? "",
+            WithoutWarranty = auctionDb.ProductDetail?.WithoutWarranty ?? false,
+            Location = auctionDb.ProductDetail?.GetAddress() ?? "",
             BidHistory = bids.Any() ? bids.Select(bid => new BidHistoryItem()
             {
                 BidderName = bid.User?.FirstName.ToString() ?? "",

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharedKernel;
 
-namespace Domain.Auction;
+namespace Domain.Entities;
 
 public sealed class ProductPhoto : Entity
 {

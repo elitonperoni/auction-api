@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Domain.Auction;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -18,6 +18,7 @@ internal sealed class GetRegisterDetailQueryHandler(
             .AsNoTracking()
             .Where(auction => auction.Id == query.Id)
             .Include(p => p.Photos)
+            .Include(p => p.ProductDetail)
             .SingleOrDefaultAsync(cancellationToken);
 
         if (auctionDb is null)
@@ -35,8 +36,15 @@ internal sealed class GetRegisterDetailQueryHandler(
         {
             Id = auctionDb.Id,
             Title = auctionDb.Title,
-            Description = auctionDb.Description,
-            InitialValue = auctionDb.StartingPrice,
+            Description = auctionDb.ProductDetail?.Description ?? "",
+            InitialValue = auctionDb.ProductDetail?.StartingPrice ?? 0,
+            ConditionProductId = auctionDb.ProductDetail?.ConditionProductId ?? 0,
+            CategoryProductId = auctionDb.ProductDetail?.CategoryProductId ?? 0,
+            ConditionPackagingId = auctionDb.ProductDetail?.ConditionPackagingId ?? 0,
+            WithoutWarranty = auctionDb.ProductDetail?.WithoutWarranty ?? false,
+            Country = auctionDb.ProductDetail?.Country ?? "",
+            State = auctionDb.ProductDetail?.State ?? "",
+            City = auctionDb.ProductDetail?.City ?? "",
             EndDate = auctionDb.EndDate,
             Photos = photosUrls
         };

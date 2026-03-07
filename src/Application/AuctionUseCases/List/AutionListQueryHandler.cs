@@ -5,7 +5,7 @@ using Application.Enums;
 using Application.Extensions;
 using Application.Interfaces;
 using Application.Pagination;
-using Domain.Auction;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -25,7 +25,7 @@ internal sealed class AutionListQueryHandler(
         {
             Id = p.Id,
             CurrentPrice = p.CurrentPrice,
-            StartingPrice = p.StartingPrice,
+            StartingPrice = p.ProductDetail?.StartingPrice ?? 0,
             Title = p.Title,
             BidCount = p.BidCount,
             EndDate = p.EndDate,
@@ -42,6 +42,7 @@ internal sealed class AutionListQueryHandler(
         IQueryable<Auction> auctionQuery = context.Auctions
                     .Where(p => p.EndDate >= DateTime.UtcNow)
                     .Include(p => p.Photos)
+                    .Include(p => p.ProductDetail)
                     .Include(p => p.User)
                     .AsQueryable();
 
@@ -49,8 +50,8 @@ internal sealed class AutionListQueryHandler(
         {
             string searchTerm = $"%{query.SearchTerm.ToLower()}%";
 
-            auctionQuery = auctionQuery.Where(p => EF.Functions.Like(p.Title.ToLower(), searchTerm)
-            || EF.Functions.Like(p.Description.ToLower(), searchTerm));
+            auctionQuery = auctionQuery.Where(p => p.ProductDetail != null && (EF.Functions.Like(p.Title.ToLower(), searchTerm)
+            || EF.Functions.Like(p.ProductDetail.Description.ToLower(), searchTerm)));
         }
 
         auctionQuery = auctionQuery.OrderBy(p => p.EndDate);

@@ -17,7 +17,9 @@ public sealed class GetDetailProductResponse
     public string Category { get; set; }
     public bool IsOwner { get; set; }
     public string Seller { get; set; }
-    public string Condition { get; set; }
+    public string ConditionProduct { get; set; }
+    public string ConditionPackaging { get; set; }
+    public bool WithoutWarranty { get; set; }
     public string Location { get; set; }
     public List<BidHistoryItem> BidHistory { get; set; }
     public DateTime StartDate { get; set; }

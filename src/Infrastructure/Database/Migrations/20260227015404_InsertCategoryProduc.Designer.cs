@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260227015404_InsertCategoryProduc")]
+    partial class InsertCategoryProduc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,11 +195,6 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("category_product_id");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("city");
-
                     b.Property<int>("ConditionPackagingId")
                         .HasColumnType("integer")
                         .HasColumnName("condition_packaging_id");
@@ -204,11 +202,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<int>("ConditionProductId")
                         .HasColumnType("integer")
                         .HasColumnName("condition_product_id");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("country");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -218,11 +211,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<decimal>("StartingPrice")
                         .HasColumnType("decimal(18, 4)")
                         .HasColumnName("starting_price");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("state");
 
                     b.Property<bool>("WithoutWarranty")
                         .HasColumnType("boolean")

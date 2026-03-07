@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Security", "CA5404:Do not disable token validation checks", Justification = "<Pending>", Scope = "member", Target = "~M:Infrastructure.Authentication.TokenProvider.GetPrincipalFromExpiredToken(System.String)~System.Security.Claims.ClaimsPrincipal")]
+[assembly: SuppressMessage("Style", "IDE0053:Use expression body for lambda expression", Justification = "<Pending>", Scope = "member", Target = "~M:Infrastructure.Database.Migrations.AddProductDetail.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)")]
