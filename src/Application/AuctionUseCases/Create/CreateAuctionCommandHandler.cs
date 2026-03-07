@@ -45,6 +45,9 @@ public class CreateAuctionCommandHandler(
                 ConditionPackagingId = command.ConditionPackagingId,
                 CategoryProductId = command.CategoryProductId,
                 WithoutWarranty = command.WithoutWarranty,
+                Country = command.Country,
+                State = command.State,
+                City = command.City,
             }
         };
 
@@ -79,7 +82,11 @@ public class CreateAuctionCommandHandler(
             auction.EndDate = command.EndDate;
             auction.ProductDetail.ConditionProductId = command.ConditionProductId;
             auction.ProductDetail.ConditionPackagingId = command.ConditionPackagingId;
+            auction.ProductDetail.CategoryProductId = command.CategoryProductId;
             auction.ProductDetail.WithoutWarranty = command.WithoutWarranty;
+            auction.ProductDetail.Country = command.Country;
+            auction.ProductDetail.State = command.State;
+            auction.ProductDetail.City = command.City;
         }
 
         if (command.ImagesToRemove?.Any() is true)

@@ -20,6 +20,9 @@ public class Create : IEndpoint
         public int ConditionPackagingId { get; set; }
         public int CategoryProductId { get; set; }
         public bool WithoutWarranty { get; set; }
+        public string Country { get; set; }
+        public string State { get; set; }
+        public string City { get; set; }
         public IFormFileCollection NewImages { get; set; }
         public List<string>? ImagesToRemove { get; set; }
     }
@@ -49,6 +52,9 @@ public class Create : IEndpoint
                 ConditionPackagingId = request.ConditionPackagingId,
                 CategoryProductId = request.CategoryProductId,
                 WithoutWarranty = request.WithoutWarranty,
+                Country = request.Country,
+                State = request.State,
+                City = request.City,
                 NewImages = imageModels,
                 ImagesToRemove = request.ImagesToRemove
             };

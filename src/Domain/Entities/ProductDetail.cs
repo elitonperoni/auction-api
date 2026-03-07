@@ -16,6 +16,9 @@ public sealed class ProductDetail : Entity
     public int ConditionPackagingId { get; set; } 
     public int CategoryProductId { get; set; } 
     public bool WithoutWarranty { get; set; }
+    public string Country { get; set; }
+    public string State { get; set; }
+    public string City { get; set; }
     public CategoryProduct? CategoryProduct { get; set; }
     public ConditionProduct? ConditionProduct { get; set; }
     public ConditionPackaging? ConditionPackaging { get; set; }
