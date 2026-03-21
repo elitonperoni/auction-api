@@ -30,7 +30,6 @@ builder.Services
 
 builder.Services.AddCaching(builder.Configuration);
 
-
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<BidProcessedConsumer>();
@@ -50,7 +49,7 @@ builder.Services.AddMassTransit(x =>
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR_WithRedisBackplane(builder.Configuration);
 
 string[] allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 
