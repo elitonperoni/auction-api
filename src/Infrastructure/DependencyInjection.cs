@@ -85,6 +85,19 @@ public static class DependencyInjection
         return services;
     }
 
+    public static IServiceCollection AddSignalR_WithRedisBackplane(this IServiceCollection services, IConfiguration configuration)
+    {
+        string? redisConnectionString = configuration.GetConnectionString("RedisConnection");
+
+        if (string.IsNullOrEmpty(redisConnectionString))
+        {
+            throw new Exception("ALERTA: A Connection String 'RedisConnection' não foi encontrada no appsettings.json!");
+        }
+        services.AddSignalR().AddStackExchangeRedis(redisConnectionString);
+
+        return services;
+    }
+
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         string? connectionString = configuration.GetConnectionString("Database");

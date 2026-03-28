@@ -57,7 +57,7 @@ internal sealed class GetDetailProductQueryHandler(
             Title = auctionDb.Title,
             Description = auctionDb.ProductDetail?.Description ?? "",
             CurrentBid = auctionDb.CurrentPrice,
-            MinBid = bids.Any() ? Math.Round(bids.Max(p => p?.Amount) * 1.1M ?? 0, 0) : 0,
+            MinBid = bids.Any() ? Math.Round(bids.Max(p => p.Amount) * 1.01m, 2) : 0,
             BidsCounts = auctionDb.BidCount,            
             IsOwner = auctionDb.User?.Id == currentUserId,
             Seller = auctionDb.User?.FirstName ?? "",

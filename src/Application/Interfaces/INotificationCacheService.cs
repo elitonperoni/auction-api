@@ -11,4 +11,5 @@ public interface INotificationCacheService
 {
     Task AddNotificationAsync(Guid userId, NotificationItem notification);
     Task<List<NotificationItem>> GetNotificationsAsync(Guid userId);
+    Task MarkNoficationAsRead(Guid? notificationId = null);
 }
