@@ -6,13 +6,13 @@ using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;
 
-namespace AuctionApi.Endpoints.Users;
+namespace AuctionApi.Endpoints.Notifications;
 
 internal sealed class GetNotifications : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("users/notifications", async (
+        app.MapGet("notifications", async (
             IQueryHandler<GetNotificationsQuery, List<NotificationItem>> handler,
             CancellationToken cancellationToken) =>
         {            
@@ -20,7 +20,7 @@ internal sealed class GetNotifications : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })        
-        .WithTags(Tags.Users)
+        .WithTags(Tags.Notifications)
         .RequireAuthorization();
     }
 }
