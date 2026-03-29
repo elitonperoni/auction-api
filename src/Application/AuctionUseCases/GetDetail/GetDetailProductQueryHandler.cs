@@ -60,7 +60,7 @@ internal sealed class GetDetailProductQueryHandler(
             MinBid = bids.Any() ? Math.Round(bids.Max(p => p.Amount) * 1.01m, 2) : 0,
             BidsCounts = auctionDb.BidCount,            
             IsOwner = auctionDb.User?.Id == currentUserId,
-            Seller = auctionDb.User?.FirstName ?? "",
+            Seller = auctionDb.User?.UserName ?? "",
             Category = auctionDb.ProductDetail?.CategoryProduct?.Name ?? "",
             ConditionProduct = auctionDb.ProductDetail?.ConditionProduct?.Name ?? "",
             ConditionPackaging = auctionDb.ProductDetail?.ConditionPackaging?.Name ?? "",
@@ -68,7 +68,7 @@ internal sealed class GetDetailProductQueryHandler(
             Location = auctionDb.ProductDetail?.GetAddress() ?? "",
             BidHistory = bids.Any() ? bids.Select(bid => new BidHistoryItem()
             {
-                BidderName = bid.User?.FirstName.ToString() ?? "",
+                BidderName = bid.User?.UserName.ToString() ?? "",
                 Amount = bid.Amount,
                 Date = bid.BidDate
             }).ToList() : [],

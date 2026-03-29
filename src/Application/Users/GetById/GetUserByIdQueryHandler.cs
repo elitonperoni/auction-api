@@ -22,9 +22,17 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUs
             .Select(u => new UserResponse
             {
                 Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email
+                UserName = u.UserName,
+                CompleteName = u.CompleteName,
+                Email = u.Email,
+                City = u.City,
+                Country = u.Country,    
+                State = u.State,
+                LanguageId = u.Language,
+                Phone = u.Phone,
+                TimeZone = u.TimeZone,
+                MemberSince = u.CreatedAt,
+                UserNotifications = u.UserNotifications.Select(p => p.NotificationTypeId).ToList()
             })
             .SingleOrDefaultAsync(cancellationToken);
 

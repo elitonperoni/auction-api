@@ -29,7 +29,7 @@ internal sealed class AutionListQueryHandler(
             Title = p.Title,
             BidCount = p.BidCount,
             EndDate = p.EndDate,
-            Seller = p.User?.FirstName ?? "",
+            Seller = p.User?.UserName ?? "",
             ImageUrl = p.Photos?.Any() is true
             ? s3Service.BuildPublicUri($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{p.Id}/{p.Photos?.FirstOrDefault()?.Name}").ToString()
             : ""

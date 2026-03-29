@@ -32,7 +32,7 @@ internal sealed class RecoveryPasswordRequestCommandHandler(
 
         await context.SaveChangesAsync(cancellationToken);
 
-        await SendEmailRecoveryPassword(token, usuario.Email, usuario.FirstName);
+        await SendEmailRecoveryPassword(token, usuario.Email, usuario.UserName);
 
         return Result.Success(token); 
     }

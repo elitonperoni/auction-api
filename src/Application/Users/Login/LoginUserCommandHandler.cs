@@ -39,6 +39,6 @@ internal sealed class LoginUserCommandHandler(
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new LoginResponse { Id = user.Id, Name = user.FirstName, Token = token, RefreshToken = newRefreshToken };
+        return new LoginResponse { Id = user.Id, Name = user.UserName, Token = token, RefreshToken = newRefreshToken };
     }
 }

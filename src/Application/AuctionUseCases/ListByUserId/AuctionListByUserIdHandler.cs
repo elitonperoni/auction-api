@@ -38,7 +38,7 @@ internal sealed class AuctionListByUserIdHandler(
             ImageUrl = p.Photos?.Any() is true
             ? s3Service.BuildPublicUri($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{p.Id}/{p.Photos?.FirstOrDefault()?.Name}").ToString()
             : "",
-            ActualWinner = !string.IsNullOrEmpty(p.LastBidder?.FirstName) ? $"@{p.LastBidder?.FirstName}" : null,
+            ActualWinner = !string.IsNullOrEmpty(p.LastBidder?.UserName) ? $"@{p.LastBidder?.UserName}" : null,
             Status = p.EndDate > DateTime.UtcNow ? "Ativo" : "Finalizado"
         }).ToList();
 

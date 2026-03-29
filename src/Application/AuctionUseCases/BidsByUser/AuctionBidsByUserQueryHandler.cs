@@ -39,7 +39,7 @@ internal sealed class AuctionBidsByUserQueryHandler(
             ImageUrl = p.Photos?.Any() is true
             ? s3Service.BuildPublicUri($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{p.Id}/{p.Photos?.FirstOrDefault()?.Name}").ToString()
             : "",
-            ActualLeader = p.LastBidder?.FirstName ?? "",
+            ActualLeader = p.LastBidder?.UserName ?? "",
             IsUserActualLeader = p.LastBidder?.Id == userId,
             IsUserWinner = p.LastBidder?.Id == userId && p.EndDate < DateTime.UtcNow,
             UserBidsCount = p.Bids?.Count ?? 0,

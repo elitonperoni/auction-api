@@ -70,7 +70,7 @@ public class SendBidCommandHandler(
             {
                 AuctionId = auctionBid.AuctionId,
                 LastBidderId = command.UserId,
-                LastBidderNamer = user?.FirstName ?? "",
+                LastBidderNamer = user?.UserName ?? "",
                 TotalBids = auction.BidCount,
                 AuctionOwnerId = auction.UserId,
                 MessageToOwner = messageToOwner,

@@ -24,9 +24,10 @@ internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, 
         {
             Id = Guid.NewGuid(),
             Email = command.Email,
-            FirstName = command.FirstName,
-            LastName = command.LastName,
-            PasswordHash = passwordHasher.Hash(command.Password)
+            UserName = command.FirstName,
+            CompleteName = command.LastName,
+            PasswordHash = passwordHasher.Hash(command.Password),
+            CreatedAt = DateTime.UtcNow
         };
 
         user.Raise(new UserRegisteredDomainEvent(user.Id));
