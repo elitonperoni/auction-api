@@ -7,4 +7,4 @@ using Application.Abstractions.Messaging;
 
 namespace Application.Users.RecoveryPassword;
 
-public sealed record RecoveryPasswordRequestCommand(string email) : ICommand<string>;
+public sealed record SendRecoveryPasswordRequestCommand(string email) : ICommand<string>;

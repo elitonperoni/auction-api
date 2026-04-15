@@ -4,7 +4,7 @@ using SharedKernel;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 
-namespace AuctionApi.Endpoints.Users;
+namespace AuctionApi.Endpoints.Users.GetById;
 
 internal sealed class GetById : IEndpoint
 {

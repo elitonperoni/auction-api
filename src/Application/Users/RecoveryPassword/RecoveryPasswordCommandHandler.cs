@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Application.Abstractions.Authentication;
+using Application.Abstractions.Data;
+using Application.Abstractions.Messaging;
+using Domain.Entities;
+using Domain.Users;
+using Microsoft.EntityFrameworkCore;
+using SharedKernel;
+
+namespace Application.Users.ResetPassword;
+
+internal sealed class RecoveryPasswordCommandHandler(
+    IApplicationDbContext context,
+    IPasswordHasher passwordHasher) : ICommandHandler<RecoveryPasswordCommand, bool>
+{
+    public async Task<Result<bool>> Handle(RecoveryPasswordCommand command, CancellationToken cancellationToken)
+    {
+        User? usuario = await context.Users.FirstOrDefaultAsync(u => u.ResetPasswordCode == command.token, cancellationToken);
+        if (usuario == null || usuario.ResetPasswordExpiry < DateTime.UtcNow || string.IsNullOrEmpty(command.password))
+        {
+            return Result.Failure<bool>(UserErrors.Unauthorized());
+        }
+
+        usuario.PasswordHash = passwordHasher.Hash(command.password);
+        usuario.ResetPasswordCode = null;
+        usuario.ResetPasswordExpiry = null;
+
+        context.Users.Update(usuario);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+}

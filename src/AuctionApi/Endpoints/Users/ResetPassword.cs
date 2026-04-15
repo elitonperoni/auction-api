@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.Users.RecoveryPassword;
 using Application.Users.ResetPassword;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
@@ -9,21 +8,22 @@ namespace AuctionApi.Endpoints.Users;
 
 internal sealed class ResetPassword : IEndpoint
 {
-    public sealed record Request(string token, string password);
+    public sealed record Request(string ActualPassword, string NewPassword);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("users/reset-password", async (
             Request request,
-            ICommandHandler<ResetPasswordCommand, bool> handler,
+            ICommandHandler<ResetPasswordCommand, Guid> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new ResetPasswordCommand(request.token, request.password);
+            var command = new ResetPasswordCommand(request.ActualPassword, request.NewPassword);
 
-            Result<bool> result = await handler.Handle(command, cancellationToken);
+            Result<Guid> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Users);
+        .WithTags(Tags.Users)
+        .RequireAuthorization();
     }
 }

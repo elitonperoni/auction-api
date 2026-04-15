@@ -12,13 +12,13 @@ using SharedKernel;
 
 namespace Application.Users.RecoveryPassword;
 
-internal sealed class RecoveryPasswordRequestCommandHandler(
+internal sealed class SendRecoveryPasswordRequestCommandHandler(
     IApplicationDbContext context,
     IMailSender mailSender,
     IOptions<SecretsApi> options
-    ) : ICommandHandler<RecoveryPasswordRequestCommand, string>
+    ) : ICommandHandler<SendRecoveryPasswordRequestCommand, string>
 {
-    public async Task<Result<string>> Handle(RecoveryPasswordRequestCommand command, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(SendRecoveryPasswordRequestCommand command, CancellationToken cancellationToken)
     {
         User? usuario = await context.Users.FirstOrDefaultAsync(u => u.Email == command.email, cancellationToken);
         if (usuario == null)

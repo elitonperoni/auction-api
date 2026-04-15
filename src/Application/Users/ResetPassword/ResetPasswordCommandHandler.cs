@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Application.Extensions;
+using Application.Users.Login;
 using Domain.Entities;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -13,25 +15,33 @@ using SharedKernel;
 
 namespace Application.Users.ResetPassword;
 
-internal sealed class ResetPasswordCommandHandler(
-    IApplicationDbContext context,
-    IPasswordHasher passwordHasher) : ICommandHandler<ResetPasswordCommand, bool>
+internal sealed class ResetPasswordCommandHandler(IApplicationDbContext context,
+    IUserContext userContext,
+    IPasswordHasher passwordHasher) : ICommandHandler<ResetPasswordCommand, Guid>
 {
-    public async Task<Result<bool>> Handle(ResetPasswordCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(ResetPasswordCommand command, CancellationToken cancellationToken)
     {
-        User? usuario = await context.Users.FirstOrDefaultAsync(u => u.ResetPasswordCode == command.token, cancellationToken);
-        if (usuario == null || usuario.ResetPasswordExpiry < DateTime.UtcNow || string.IsNullOrEmpty(command.password))
+        Guid userId = userContext.UserId;
+        User? user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user == null)
         {
-            return Result.Failure<bool>(UserErrors.Unauthorized());
+            return Result.Failure<Guid>(UserErrors.NotFound(userId));
         }
 
-        usuario.PasswordHash = passwordHasher.Hash(command.password);
-        usuario.ResetPasswordCode = null;
-        usuario.ResetPasswordExpiry = null;
+        bool verified = passwordHasher.Verify(command.ActualPassword, user.PasswordHash);
 
-        context.Users.Update(usuario);
+        if (!verified)
+        {
+            return Result.Failure<Guid>(UserErrors.NotFound(userId));
+        }
+
+        user.PasswordHash = passwordHasher.Hash(command.NewPassword);
+        user.ResetPasswordCode = null;
+        user.ResetPasswordExpiry = null;
+
+        context.Users.Update(user);
         await context.SaveChangesAsync(cancellationToken);
 
-        return true;
+        return user.Id;
     }
 }
