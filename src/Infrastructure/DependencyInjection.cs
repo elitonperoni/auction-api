@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
+using System.Threading.RateLimiting;
 using Amazon.S3;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
@@ -14,11 +16,13 @@ using Infrastructure.Caching;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.ExternalServices;
+using Infrastructure.Filters;
 using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -85,6 +89,32 @@ public static class DependencyInjection
         return services;
     }
 
+    public static IServiceCollection ConfigureRateLimiter(this IServiceCollection services)
+    {
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.AddPolicy(PolicyRateLimiter.BidPolicy, httpContext =>
+            {
+                string partitionKey = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                                   ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                                   ?? "unknown";
+
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: partitionKey,
+                    factory: partition => new FixedWindowRateLimiterOptions
+                    {
+                        AutoReplenishment = true,
+                        PermitLimit = 5, 
+                        Window = TimeSpan.FromSeconds(1)
+                    });
+            });
+        });
+
+        return services;
+    }
+
     public static IServiceCollection AddSignalR_WithRedisBackplane(this IServiceCollection services, IConfiguration configuration)
     {
         string? redisConnectionString = configuration.GetConnectionString("RedisConnection");
@@ -93,7 +123,8 @@ public static class DependencyInjection
         {
             throw new Exception("ALERTA: A Connection String 'RedisConnection' não foi encontrada no appsettings.json!");
         }
-        services.AddSignalR().AddStackExchangeRedis(redisConnectionString);
+
+        services.AddSignalR(options => options.AddFilter<RateLimitingHubFilter>()).AddStackExchangeRedis(redisConnectionString);
 
         return services;
     }

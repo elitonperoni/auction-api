@@ -30,6 +30,8 @@ builder.Services
 
 builder.Services.AddCaching(builder.Configuration);
 
+builder.Services.ConfigureRateLimiter();
+
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<BidProcessedConsumer>();
@@ -82,6 +84,8 @@ app.MapHealthChecks("health", new HealthCheckOptions
 });
 
 app.UseCookiePolicy();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 

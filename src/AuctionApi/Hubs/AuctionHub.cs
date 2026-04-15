@@ -2,7 +2,9 @@
 using Domain.Events;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
+using SharedKernel;
 
 namespace AuctionApi.Hubs;
 

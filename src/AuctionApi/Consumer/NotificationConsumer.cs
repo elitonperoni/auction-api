@@ -1,5 +1,6 @@
 ﻿using AuctionApi.Hubs;
 using Domain.Events;
+using Infrastructure;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 
