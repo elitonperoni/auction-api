@@ -16,5 +16,6 @@ public sealed record UserResponse
     public int LanguageId { get; set; }
     public string TimeZone { get; set; }
     public DateTime MemberSince { get; set; }
+    public bool TelegramConfigured { get; set; }
     public List<int> UserNotifications { get; set; }
 }

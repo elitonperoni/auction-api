@@ -47,6 +47,7 @@ public class BidPlacedConsumer(ICommandHandler<SendBidCommand, SendBidDtoRespons
             responseBid.Value.LastBidderNamer,
             responseBid.Value.AuctionOwnerId,
             responseBid.Value.MessageToOwner,
+            responseBid.Value.DescriptionDetail,
             responseBid.Value.Date),
             context.CancellationToken);
     }

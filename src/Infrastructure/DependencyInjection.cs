@@ -68,6 +68,9 @@ public static class DependencyInjection
 
         services.AddScoped<IS3Service, S3Service>();
         services.AddScoped<IAuctionService, AuctionService>();
+        services.AddScoped<ITelegramService, TelegramService>();
+
+        services.AddHttpClient("telegram");
 
         return services;
     }

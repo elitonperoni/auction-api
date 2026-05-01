@@ -30,6 +30,7 @@ public sealed class User : Entity
     public string City { get; set; }
     public int Language { get; set; }
     public string TimeZone { get; set; }
+    public string? TelegramChatId { get; set; }
 
     [Column(TypeName = "timestamp with time zone")]
     public DateTime CreatedAt { get; set; }

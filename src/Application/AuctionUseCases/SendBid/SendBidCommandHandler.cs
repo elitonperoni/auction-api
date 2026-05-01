@@ -65,7 +65,8 @@ public class SendBidCommandHandler(
             User? user = await context.Users.AsNoTracking().SingleOrDefaultAsync(p => p.Id == command.UserId, cancellationToken);
 
             string messageToOwner = $"Você recebeu um novo lance no item {auction.Title}";
-         
+            string descriptionDetail = $"{messageToOwner} | @{user?.UserName} | R${auctionBid.Amount}";
+            
             return Result.Success(new SendBidDtoResponse
             {
                 AuctionId = auctionBid.AuctionId,
@@ -75,7 +76,8 @@ public class SendBidCommandHandler(
                 AuctionOwnerId = auction.UserId,
                 MessageToOwner = messageToOwner,
                 Date = auctionBid.BidDate,
-                Amount = auctionBid.Amount
+                Amount = auctionBid.Amount,
+                DescriptionDetail = descriptionDetail
             });
         }
         catch (DbUpdateException)

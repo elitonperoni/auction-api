@@ -14,6 +14,7 @@ public sealed class SendBidDtoResponse
     public string LastBidderNamer { get; set; }
     public Guid AuctionOwnerId { get; set; }
     public string MessageToOwner { get; set; }
+    public string DescriptionDetail { get; set; }
     public DateTime Date { get; set; }    
     public decimal Amount { get; set; }    
 }

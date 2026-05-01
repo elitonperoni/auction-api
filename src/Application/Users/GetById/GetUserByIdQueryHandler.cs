@@ -32,6 +32,7 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUs
                 Phone = u.Phone,
                 TimeZone = u.TimeZone,
                 MemberSince = u.CreatedAt,
+                TelegramConfigured = u.TelegramChatId != null,
                 UserNotifications = u.UserNotifications.Select(p => p.NotificationTypeId).ToList()
             })
             .SingleOrDefaultAsync(cancellationToken);

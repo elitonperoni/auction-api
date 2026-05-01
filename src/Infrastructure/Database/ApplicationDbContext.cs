@@ -21,6 +21,8 @@ public sealed class ApplicationDbContext(
     public DbSet<Auction> Auctions { get; set; }
     public DbSet<Bid> Bids { get; set; }
     public DbSet<ProductPhoto> ProductPhotos { get; set; }
+    public DbSet<NotificationType> NotificationTypes { get; set; }
+    public DbSet<UserNotification> UserNotifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

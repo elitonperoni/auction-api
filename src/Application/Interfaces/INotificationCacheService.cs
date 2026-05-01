@@ -10,6 +10,8 @@ namespace Application.Interfaces;
 public interface INotificationCacheService
 {
     Task AddNotificationAsync(Guid userId, NotificationItem notification);
+    Task<Guid?> ConsumeLinkTokenTelegram(string token);
+    Task<string> GenerateLinkTokenTelegram(Guid userId);
     Task<List<NotificationItem>> GetNotificationsAsync(Guid userId);
     Task MarkNoficationAsRead(Guid? notificationId = null);
 }

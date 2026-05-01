@@ -14,4 +14,5 @@ public record BidProcessedEvent(
     string LastBidderNamer, 
     Guid AuctionOwnerId,
     string MessageToOwner,
+    string DescriptionDetail,
     DateTime ProcessedAt);

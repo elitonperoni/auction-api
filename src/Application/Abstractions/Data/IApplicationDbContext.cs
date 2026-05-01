@@ -13,6 +13,8 @@ public interface IApplicationDbContext
     DbSet<Auction> Auctions { get; }
     DbSet<ProductPhoto> ProductPhotos { get; }
     DbSet<Bid> Bids { get; }
+    DbSet<UserNotification> UserNotifications { get; }
+    DbSet<NotificationType> NotificationTypes { get; }
 
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

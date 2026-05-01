@@ -82,4 +82,34 @@ public class NotificationCacheService(IConnectionMultiplexer redis, IUserContext
         _ = tx.KeyExpireAsync(key, TimeSpan.FromDays(7));
         await tx.ExecuteAsync();
     }
+
+    public async Task<string> GenerateLinkTokenTelegram(Guid userId)
+    {
+        const int TokenExpiryMinutes = 10;
+
+        IDatabase db = redis.GetDatabase();
+
+        string token = Guid.NewGuid().ToString("N");
+        string key = $"telegram:link:{token}";
+
+        await db.StringSetAsync(key, userId.ToString(), TimeSpan.FromMinutes(TokenExpiryMinutes));
+
+        return token;
+    }
+
+    public async Task<Guid?> ConsumeLinkTokenTelegram(string token)
+    {
+        IDatabase db = redis.GetDatabase();
+        string key = $"telegram:link:{token}";
+
+        string? userIdStr = await db.StringGetAsync(key);
+
+        if (string.IsNullOrEmpty(userIdStr))
+        {
+            return null;
+        }
+        await db.KeyDeleteAsync(key);
+
+        return Guid.Parse(userIdStr);
+    }
 }

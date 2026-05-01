@@ -35,7 +35,7 @@ public class RateLimitingHubFilter : IHubFilter
 
             if (!lease.IsAcquired)
             {
-                throw new HubException("RateLimitExceeded: Você está enviando lances rápido demais.");
+                throw new HubException("RateLimitExceeded: Too many requests. Please try again later.");
             }
         }
 
