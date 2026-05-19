@@ -1,20 +1,15 @@
 ﻿using System.Globalization;
 using System.Net.Http.Json;
 using Application.Common.Interfaces;
+using Domain.Configurations;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.ExternalServices;
 
-public class TelegramService : ITelegramService
+public class TelegramService(IHttpClientFactory httpFactory, IOptions<SecretsApi> options) : ITelegramService
 {
-    private readonly HttpClient _http;
-    //private const string PrefixToken = "telegram:token:";
-    private string BotToken => "8765187560:AAE6gZ_80ciQ91__BJOoqFivFCzXxALFTJg";
-    private string ApiUrl => $"https://api.telegram.org/bot{BotToken}";
-    public TelegramService(IHttpClientFactory httpFactory)
-    {
-        _http = httpFactory.CreateClient("telegram");
-    }
-
+    private readonly HttpClient _http = httpFactory.CreateClient("telegram");
+    private string ApiUrl => $"https://api.telegram.org/bot{options.Value.ApiKeyTelegram}";
     public async Task SendMessage(string chatId, string mensagem)
     {
         await PostAsync("sendMessage", new
