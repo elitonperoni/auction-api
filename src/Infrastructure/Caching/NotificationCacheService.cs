@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using Application.Abstractions.Authentication;
-using Application.DTOs;
-using Application.Interfaces;
+using Application.Common.Abstractions.Authentication;
+using Application.Common.DTOs;
+using Application.Common.Interfaces;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 

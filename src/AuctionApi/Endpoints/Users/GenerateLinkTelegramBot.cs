@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Users.GenerateLinkTelegramBot;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Users.Command.GenerateLinkTelegramBot;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

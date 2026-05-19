@@ -1,0 +1,41 @@
+﻿using System.Net;
+using System.Net.Mail;
+using Application.Common.Abstractions.Authentication;
+using Application.Common.Abstractions.Data;
+using Application.Common.Abstractions.Messaging;
+using Domain.Entities;
+using Domain.Users;
+using Microsoft.EntityFrameworkCore;
+using SharedKernel;
+
+namespace Application.Features.Users.Command.Register;
+
+internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher)
+    : ICommandHandler<RegisterUserCommand, Guid>
+{
+    public async Task<Result<Guid>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+    {
+        if (await context.Users.AnyAsync(u => u.Email == command.Email, cancellationToken))
+        {
+            return Result.Failure<Guid>(UserErrors.EmailNotUnique);
+        }
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = command.Email,
+            UserName = command.FirstName,
+            CompleteName = command.LastName,
+            PasswordHash = passwordHasher.Hash(command.Password),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        user.Raise(new UserRegisteredDomainEvent(user.Id));
+
+        context.Users.Add(user);
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        return user.Id;
+    }
+}

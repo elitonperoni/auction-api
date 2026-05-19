@@ -1,11 +1,6 @@
-﻿using Application.Abstractions.Messaging;
-using Application.DTOs;
-using Application.Notifications.TelegramNotification;
-using Application.Users.Notifications;
-using AuctionApi.Extensions;
-using AuctionApi.Infrastructure;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Notifications.Command.TelegramNotification;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
 
 namespace AuctionApi.Endpoints.Webhook;
 

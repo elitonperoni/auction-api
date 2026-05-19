@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.AuctionUseCases.Create;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Auctions.Commands.Create;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using Microsoft.AspNetCore.Mvc;

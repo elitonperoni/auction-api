@@ -1,4 +1,4 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Common.Abstractions.Messaging;
 using Application.UserNotifications.UpdateUserNotifications;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;

@@ -1,8 +1,8 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Users.GetById;
-using SharedKernel;
+﻿using SharedKernel;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
+using Application.Features.Users.Queries.GetById;
+using Application.Common.Abstractions.Messaging;
 
 namespace AuctionApi.Endpoints.Users.GetById;
 

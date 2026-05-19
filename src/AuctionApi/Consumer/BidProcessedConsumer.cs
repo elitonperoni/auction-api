@@ -1,14 +1,10 @@
-﻿using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
-using Application.Interfaces;
-using Application.Users.SendUserMessageTelegram.cs;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Users.Command.SendUserMessageTelegram.cs;
 using AuctionApi.Hubs;
-using Domain.Entities;
 using Domain.Events;
 using Infrastructure;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 
 namespace AuctionApi.Consumer;
 

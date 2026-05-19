@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Net.Http.Json;
-using Application.Interfaces;
+using Application.Common.Interfaces;
 
 namespace Infrastructure.ExternalServices;
 

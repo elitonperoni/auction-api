@@ -1,6 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Users.Login;
-using Application.Users.RefreshToken;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Users.Command.RefreshToken;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

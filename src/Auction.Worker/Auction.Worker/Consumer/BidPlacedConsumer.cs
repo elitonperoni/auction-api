@@ -1,7 +1,7 @@
-﻿using Application.Abstractions.Messaging;
-using Application.AuctionUseCases.SendBid;
-using Application.DTOs;
-using Application.Interfaces;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Common.DTOs;
+using Application.Common.Interfaces;
+using Application.Features.Auctions.Commands.SendBid;
 using Domain.Events;
 using MassTransit;
 using SharedKernel;

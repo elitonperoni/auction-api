@@ -1,7 +1,6 @@
-﻿using Application.Abstractions.Messaging;
-using Application.DTOs;
-using Application.Users.GetById;
-using Application.Users.Notifications;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Common.DTOs;
+using Application.Features.Users.Queries.GetNotifications;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

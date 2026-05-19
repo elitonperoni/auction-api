@@ -1,11 +1,8 @@
-﻿using Application.Abstractions.Messaging;
-using Application.AuctionUseCases.Create;
-using Application.AuctionUseCases.GetDetail;
-using Application.AuctionUseCases.List;
-using Application.Pagination;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Common.Pagination;
+using Application.Features.Auctions.Queries.List;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 
 namespace AuctionApi.Endpoints.AuctionBid;
