@@ -8,6 +8,8 @@ using HealthChecks.UI.Client;
 using Infrastructure;
 using MassTransit;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Wolverine;
+using Wolverine.RabbitMQ;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -32,22 +34,20 @@ builder.Services.AddCaching(builder.Configuration);
 
 builder.Services.ConfigureRateLimiter();
 
-builder.Services.AddMassTransit(x =>
+builder.Host.UseWolverine(opts =>
 {
-    x.AddConsumer<BidProcessedConsumer>();
-    x.AddConsumer<NotificationConsumer>();
+    string host = builder.Configuration["RabbitMq:Host"] ?? "";
+    string username = builder.Configuration["RabbitMq:Username"] ?? "";
+    string password = builder.Configuration["RabbitMq:Password"] ?? "";
 
-    x.UsingRabbitMq((context, cfg) =>
+    opts.UseRabbitMq(rabbit =>
     {
-        cfg.Host(builder.Configuration["RabbitMq:Host"] ?? "", "/", h => {
-            h.Username(builder.Configuration["RabbitMq:Username"] ?? "");
-            h.Password(builder.Configuration["RabbitMq:Password"] ?? "");
-        });
-
-        cfg.ConfigureEndpoints(context);
-    });
-}
-    );
+        rabbit.HostName = host;
+        rabbit.UserName = username;
+        rabbit.Password = password;
+    }).AutoProvision()              // cria exchanges/filas automaticamente
+    .UseConventionalRouting();    // equivalente ao ConfigureEndpoints()
+});
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 

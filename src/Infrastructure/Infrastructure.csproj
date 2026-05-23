@@ -17,6 +17,7 @@
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="WolverineFx.RabbitMQ" />
   </ItemGroup>
 
   <ItemGroup>

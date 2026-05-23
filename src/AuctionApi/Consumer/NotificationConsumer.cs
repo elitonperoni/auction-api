@@ -1,27 +1,18 @@
 ﻿using AuctionApi.Hubs;
 using Domain.Events;
 using Infrastructure;
-using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 
 namespace AuctionApi.Consumer;
 
-public class NotificationConsumer : IConsumer<NotificationEvent>
+public class NotificationHandler(
+    IHubContext<AuctionHub> hubContext)
 {
-    private readonly IHubContext<AuctionHub> _hubContext;
-
-    public NotificationConsumer(IHubContext<AuctionHub> hubContext, ILogger<NotificationConsumer> logger)
+    public async Task Handle(NotificationEvent msg, CancellationToken cancellationToken)
     {
-        _hubContext = hubContext;
-    }
-
-    public async Task Consume(ConsumeContext<NotificationEvent> context)
-    {
-        NotificationEvent bidResult = context.Message;
-        
-        await _hubContext.Clients.Client(bidResult.CallerId.ToString())
-        .SendAsync(ChannelNames.ReceiveNotification,
-            bidResult.Message,
-            context.CancellationToken);
+        await hubContext.Clients.Client(msg.CallerId.ToString())
+            .SendAsync(ChannelNames.ReceiveNotification,
+                msg.Message,
+                cancellationToken);
     }
 }

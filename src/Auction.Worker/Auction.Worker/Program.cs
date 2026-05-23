@@ -1,10 +1,14 @@
 
 using Application;
 using Auction.Worker.Consumer;
+using Domain.Events;
 using Infrastructure;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Wolverine;
+using Wolverine.ErrorHandling;
+using Wolverine.RabbitMQ;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
@@ -24,25 +28,34 @@ builder.Services
 
 builder.Services.AddCaching(builder.Configuration);
 
-builder.Services.AddMassTransit(x =>
+builder.UseWolverine(opts => 
 {
-    x.AddConsumer<BidPlacedConsumer>(cfg => cfg.UseMessageRetry(r =>
-        {
-            r.Handle<DbUpdateConcurrencyException>();            
-            r.Interval(5, TimeSpan.FromMilliseconds(100));
-        }));    
+    string host = builder.Configuration["RabbitMq:Host"] ?? "";
+    string username = builder.Configuration["RabbitMq:Username"] ?? "";
+    string password = builder.Configuration["RabbitMq:Password"] ?? "";
 
-    x.UsingRabbitMq((context, cfg) =>
+    opts.UseRabbitMq(rabbit =>
     {
-        cfg.Host(builder.Configuration["RabbitMq:Host"] ?? "", "/", h => {
-            h.Username(builder.Configuration["RabbitMq:Username"] ?? "");
-            h.Password(builder.Configuration["RabbitMq:Password"] ?? "");
-        });
-        cfg.PrefetchCount = 1;
-        cfg.ConfigureEndpoints(context);
+        rabbit.HostName = host;
+        rabbit.UserName = username;
+        rabbit.Password = password;
+    })
+        .AutoProvision()
+        .UseConventionalRouting();
 
-    });
+    opts.DefaultLocalQueue.MaximumParallelMessages(1);
+
+    opts.Policies.OnException<DbUpdateConcurrencyException>()
+              .RetryWithCooldown(
+                  TimeSpan.FromMilliseconds(100),
+                  TimeSpan.FromMilliseconds(100),
+                  TimeSpan.FromMilliseconds(100),
+                  TimeSpan.FromMilliseconds(100),
+                  TimeSpan.FromMilliseconds(100)
+              );
 });
+
+
 
 builder.Services.AddRouting(); 
 builder.Services.AddAuthorization();

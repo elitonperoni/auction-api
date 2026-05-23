@@ -3,36 +3,34 @@ using Application.Features.Users.Command.SendUserMessageTelegram.cs;
 using AuctionApi.Hubs;
 using Domain.Events;
 using Infrastructure;
-using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 
 namespace AuctionApi.Consumer;
 
-public class BidProcessedConsumer(IHubContext<AuctionHub> hubContext,
-    ICommandHandler<SendUserMessageTelegramCommand, bool> sendUserMessageTelegramHandler) : IConsumer<BidProcessedEvent>
+public class BidProcessedHandler(
+    IHubContext<AuctionHub> hubContext,
+    ICommandHandler<SendUserMessageTelegramCommand, bool> sendUserMessageTelegramHandler)
 {
-    public async Task Consume(ConsumeContext<BidProcessedEvent> context)
+    public async Task Handle(BidProcessedEvent msg, CancellationToken cancellationToken)
     {
-        BidProcessedEvent bidResult = context.Message;
-       
-        await hubContext.Clients.Group(bidResult.AuctionId.ToString())
+        await hubContext.Clients.Group(msg.AuctionId.ToString())
             .SendAsync(ChannelNames.ReceiveNewBid,
-                bidResult.AuctionId,
-                bidResult.TotalAmount,
-                bidResult.TotalBids,
-                bidResult.LastBidderId,
-                bidResult.LastBidderNamer,
-                DateTime.UtcNow, 
-                context.CancellationToken);
+                msg.AuctionId,
+                msg.TotalAmount,
+                msg.TotalBids,
+                msg.LastBidderId,
+                msg.LastBidderNamer,
+                DateTime.UtcNow,
+                cancellationToken);
 
-        await hubContext.Clients.Group(bidResult.AuctionOwnerId.ToString())
+        await hubContext.Clients.Group(msg.AuctionOwnerId.ToString())
             .SendAsync(ChannelNames.ReceiveUserNotification,
-                bidResult.AuctionId,
-                bidResult.MessageToOwner,
-                context.CancellationToken);
+                msg.AuctionId,
+                msg.MessageToOwner,
+                cancellationToken);
 
         await sendUserMessageTelegramHandler.Handle(
-            new SendUserMessageTelegramCommand(bidResult.AuctionOwnerId, bidResult.DescriptionDetail), 
-            context.CancellationToken);
+            new SendUserMessageTelegramCommand(msg.AuctionOwnerId, msg.DescriptionDetail),
+            cancellationToken);
     }
 }
