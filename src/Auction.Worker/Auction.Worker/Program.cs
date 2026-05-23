@@ -3,6 +3,7 @@ using Application;
 using Auction.Worker.Consumer;
 using Domain.Events;
 using Infrastructure;
+using JasperFx.CodeGeneration;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -45,6 +46,8 @@ builder.UseWolverine(opts =>
 
     opts.DefaultLocalQueue.MaximumParallelMessages(1);
 
+    opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Static;
+
     opts.Policies.OnException<DbUpdateConcurrencyException>()
               .RetryWithCooldown(
                   TimeSpan.FromMilliseconds(100),
@@ -54,8 +57,6 @@ builder.UseWolverine(opts =>
                   TimeSpan.FromMilliseconds(100)
               );
 });
-
-
 
 builder.Services.AddRouting(); 
 builder.Services.AddAuthorization();

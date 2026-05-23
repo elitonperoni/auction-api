@@ -1,12 +1,11 @@
 using System.Reflection;
 using Application;
 using AuctionApi;
-using AuctionApi.Consumer;
 using AuctionApi.Extensions;
 using AuctionApi.Hubs;
 using HealthChecks.UI.Client;
 using Infrastructure;
-using MassTransit;
+using JasperFx.CodeGeneration;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Wolverine;
 using Wolverine.RabbitMQ;
@@ -40,13 +39,15 @@ builder.Host.UseWolverine(opts =>
     string username = builder.Configuration["RabbitMq:Username"] ?? "";
     string password = builder.Configuration["RabbitMq:Password"] ?? "";
 
+    opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Static;
+
     opts.UseRabbitMq(rabbit =>
     {
         rabbit.HostName = host;
         rabbit.UserName = username;
         rabbit.Password = password;
-    }).AutoProvision()              // cria exchanges/filas automaticamente
-    .UseConventionalRouting();    // equivalente ao ConfigureEndpoints()
+    }).AutoProvision()            
+    .UseConventionalRouting();    
 });
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
