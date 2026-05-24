@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using SharedKernel;
+using Wolverine;
 
 namespace AuctionApi.Hubs;
 
 [Authorize]
-public class AuctionHub(IPublishEndpoint publishEndpoint) : Hub
+public class AuctionHub(IMessageBus bus) : Hub
 {
     public async Task SendBid(string groupName, string bidValueString)
     {
@@ -27,14 +28,13 @@ public class AuctionHub(IPublishEndpoint publishEndpoint) : Hub
             return;
         }
 
-        await publishEndpoint.Publish(
+        await bus.SendAsync(
             new BidPlaced(
                 Context?.ConnectionId?.ToString() ?? "",
-                Guid.Parse(groupName), 
-                userId.Value, bidAmount, 
+                Guid.Parse(groupName),
+                userId.Value,
+                bidAmount,
                 DateTime.UtcNow));
-
-        //await LoadTest(bidAmount, groupName, userId.Value);        
     }
 
     //private async Task LoadTest(decimal bidAmount, string groupName, Guid userId)

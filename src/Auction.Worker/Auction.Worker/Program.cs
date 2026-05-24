@@ -1,15 +1,20 @@
 
 using Application;
+using Application.Common.Abstractions.Messaging;
 using Auction.Worker.Consumer;
 using Domain.Events;
 using Infrastructure;
 using JasperFx.CodeGeneration;
+using JasperFx.CodeGeneration.Model;
+using JasperFx.Core;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Wolverine;
 using Wolverine.ErrorHandling;
 using Wolverine.RabbitMQ;
+using Wolverine.Runtime;
+using Wolverine.Runtime.Handlers;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
@@ -29,33 +34,31 @@ builder.Services
 
 builder.Services.AddCaching(builder.Configuration);
 
-builder.UseWolverine(opts => 
+builder.UseWolverine(opts =>
 {
-    string host = builder.Configuration["RabbitMq:Host"] ?? "";
-    string username = builder.Configuration["RabbitMq:Username"] ?? "";
-    string password = builder.Configuration["RabbitMq:Password"] ?? "";
-
     opts.UseRabbitMq(rabbit =>
     {
-        rabbit.HostName = host;
-        rabbit.UserName = username;
-        rabbit.Password = password;
-    })
-        .AutoProvision()
-        .UseConventionalRouting();
+        rabbit.HostName = builder.Configuration["RabbitMq:Host"] ?? "";
+        rabbit.UserName = builder.Configuration["RabbitMq:Username"] ?? "";
+        rabbit.Password = builder.Configuration["RabbitMq:Password"] ?? "";
+    }).AutoProvision()
+     .UseConventionalRouting();
+
+   // opts.UseRuntimeCompilation();
+
+    opts.RestoreV5Defaults();
 
     opts.DefaultLocalQueue.MaximumParallelMessages(1);
 
-    opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Static;
+    //opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
 
     opts.Policies.OnException<DbUpdateConcurrencyException>()
-              .RetryWithCooldown(
-                  TimeSpan.FromMilliseconds(100),
-                  TimeSpan.FromMilliseconds(100),
-                  TimeSpan.FromMilliseconds(100),
-                  TimeSpan.FromMilliseconds(100),
-                  TimeSpan.FromMilliseconds(100)
-              );
+        .RetryWithCooldown(
+            100.Milliseconds(),
+            100.Milliseconds(),
+            100.Milliseconds(),
+            100.Milliseconds(),
+            100.Milliseconds());
 });
 
 builder.Services.AddRouting(); 

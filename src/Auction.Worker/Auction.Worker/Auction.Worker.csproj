@@ -10,12 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit.RabbitMQ" />
 	 <PackageReference Include="Microsoft.Extensions.Hosting" />
 	 <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
 	 <PackageReference Include="Scrutor" />
 	  <PackageReference Include="WolverineFx.RabbitMQ" />
-	 <PackageVersion Include="WolverineFx.RuntimeCompilation" />
+	  <PackageReference Include="WolverineFx.RuntimeCompilation" />
   </ItemGroup>
 
   <ItemGroup>
