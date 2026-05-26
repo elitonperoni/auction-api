@@ -1,16 +1,16 @@
 using System.Reflection;
+using Amazon;
+using Amazon.Runtime;
 using Application;
 using AuctionApi;
-using AuctionApi.Consumer;
 using AuctionApi.Extensions;
 using AuctionApi.Hubs;
-using Domain.Events;
+using AuctionApi.Infrastructure;
 using HealthChecks.UI.Client;
 using Infrastructure;
-using JasperFx.CodeGeneration;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Wolverine;
-using Wolverine.RabbitMQ;
+using Wolverine.AmazonSqs;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -33,24 +33,9 @@ builder.Services
 
 builder.Services.AddCaching(builder.Configuration);
 
+builder.AddWolverine(builder.Configuration);
+
 builder.Services.ConfigureRateLimiter();
-
-builder.Host.UseWolverine(opts =>
-{
-    //opts.UseRuntimeCompilation();
-
-    opts.RestoreV5Defaults();
-
-    //opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
-
-    opts.UseRabbitMq(rabbit =>
-    {
-        rabbit.HostName = builder.Configuration["RabbitMq:Host"] ?? "";
-        rabbit.UserName = builder.Configuration["RabbitMq:Username"] ?? "";
-        rabbit.Password = builder.Configuration["RabbitMq:Password"] ?? "";
-    }).AutoProvision()
-    .UseConventionalRouting();
-});
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
