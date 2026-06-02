@@ -3,6 +3,7 @@ using Application.Common.Abstractions.Messaging;
 using Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
+using SharedKernel.Enum;
 
 namespace Application.Features.Users.Command.SendUserMessageTelegram.cs;
 
@@ -11,7 +12,7 @@ internal sealed class SendUserMessageTelegramHandler(IApplicationDbContext conte
     public async  Task<Result<bool>> Handle(SendUserMessageTelegramCommand command, CancellationToken cancellationToken)
     {
         bool userCanReceiveTelegramMessages = await context.UserNotifications
-            .AnyAsync(p => p.UserId == command.UserId && p.NotificationTypeId == 1, cancellationToken);
+            .AnyAsync(p => p.UserId == command.UserId && p.NotificationTypeId == (int)NotificationType.Telegram, cancellationToken);
 
         if (userCanReceiveTelegramMessages)
         {
