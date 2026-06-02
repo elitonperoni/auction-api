@@ -9,7 +9,7 @@ public partial class InsertIntegrationTypeValues : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.Sql($@"insert into public.notification_types (id, name) 
-            values {(int)NotificationType.Telegram}");
+            values ({(int)NotificationType.Telegram}, 'Telegram')");
     }
 
     /// <inheritdoc />
