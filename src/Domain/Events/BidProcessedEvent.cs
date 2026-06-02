@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Events;
+﻿namespace Domain.Events;
 
 public record BidProcessedEvent(
     Guid AuctionId, 
@@ -14,4 +8,5 @@ public record BidProcessedEvent(
     string LastBidderNamer, 
     Guid AuctionOwnerId,
     string MessageToOwner,
+    string DescriptionDetail,
     DateTime ProcessedAt);

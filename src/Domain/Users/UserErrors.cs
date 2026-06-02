@@ -19,4 +19,5 @@ public static class UserErrors
     public static readonly Error EmailNotUnique = Error.Conflict(
         "Users.EmailNotUnique",
         "O email informado já existe");
+
 }

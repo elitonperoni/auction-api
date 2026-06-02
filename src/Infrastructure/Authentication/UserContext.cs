@@ -1,9 +1,9 @@
-﻿using Application.Abstractions.Authentication;
+﻿using Application.Common.Abstractions.Authentication;
 using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Authentication;
 
-internal sealed class UserContext : IUserContext
+public sealed class UserContext : IUserContext
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -16,6 +16,5 @@ internal sealed class UserContext : IUserContext
         _httpContextAccessor
             .HttpContext?
             .User
-            .GetUserId() ??
-        throw new ApplicationException("User context is unavailable");
+            .GetUserId() ?? Guid.Empty;
 }

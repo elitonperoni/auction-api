@@ -1,10 +1,14 @@
 
+using Amazon;
+using Amazon.Runtime;
 using Application;
-using Auction.Worker.Consumer;
 using Infrastructure;
-using MassTransit;
+using JasperFx.Core;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+using Wolverine;
+using Wolverine.AmazonSqs;
+using Wolverine.ErrorHandling;
+using Auction.Worker.Infrastructure;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
@@ -24,25 +28,7 @@ builder.Services
 
 builder.Services.AddCaching(builder.Configuration);
 
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<BidPlacedConsumer>(cfg => cfg.UseMessageRetry(r =>
-        {
-            r.Handle<DbUpdateConcurrencyException>();            
-            r.Interval(5, TimeSpan.FromMilliseconds(100));
-        }));    
-
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.Host(builder.Configuration["RabbitMq:Host"] ?? "", "/", h => {
-            h.Username(builder.Configuration["RabbitMq:Username"] ?? "");
-            h.Password(builder.Configuration["RabbitMq:Password"] ?? "");
-        });
-        cfg.PrefetchCount = 1;
-        cfg.ConfigureEndpoints(context);
-
-    });
-});
+builder.AddWolverine(builder.Configuration);
 
 builder.Services.AddRouting(); 
 builder.Services.AddAuthorization();

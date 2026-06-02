@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Notifications.MarkAsReadById;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Notifications.Command.MarkAsReadById;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using Microsoft.AspNetCore.Mvc;

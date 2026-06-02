@@ -1,6 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Application.AuctionUseCases.BidsByUser;
-using Application.AuctionUseCases.ListByUserId;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Auctions.Queries.BidsByUser;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

@@ -22,4 +22,14 @@
 	<InternalsVisibleTo Include="Application.UnitTests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\" />
+    <Folder Include="Features\" />
+    <Folder Include="Features\Auctions\Commands\" />
+    <Folder Include="Features\Auctions\Queries\" />
+    <Folder Include="Features\Notifications\Command\" />
+    <Folder Include="Features\Users\Command\" />
+    <Folder Include="Features\Users\Queries\" />
+  </ItemGroup>
+
 </Project>

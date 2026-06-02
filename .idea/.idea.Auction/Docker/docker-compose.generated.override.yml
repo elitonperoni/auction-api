@@ -1,0 +1,75 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  web-api:
+    build:
+      context: "C:\\Dev\\C-Sharp\\Auction-web\\Auction"
+      dockerfile: "src/AuctionApi/Dockerfile"
+      target: "base"
+      args:
+        BUILD_CONFIGURATION: "Debug"
+    command: []
+    entrypoint:
+    - "/opt/JetBrains/RiderDebuggerTools/linux-x64/JetBrains.Debugger.Worker"
+    - "--runtimeconfig"
+    - "/opt/JetBrains/RiderDebuggerTools/JetBrains.Debugger.Worker.runtimeconfig.json"
+    - "--mode=server"
+    - "--frontend-port=57000"
+    - "--backend-port=57200"
+    - "--roslyn-worker-port=57404"
+    - "--timeout=60"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      RIDER_DEBUGGER_LOG_DIR: "/var/opt/JetBrains/RiderDebuggerTools"
+      RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    image: "webapi:dev"
+    ports:
+    - "127.0.0.1:57004:57000"
+    - "127.0.0.1:57204:57200"
+    - "127.0.0.1:57404:57404"
+    volumes:
+    - "C:\\Dev\\C-Sharp\\Auction-web\\Auction\\src\\AuctionApi:/app:rw"
+    - "C:\\Dev\\C-Sharp\\Auction-web\\Auction:/src:rw"
+    - "C:\\Users\\elito\\AppData\\Roaming\\Microsoft\\UserSecrets:/home/app/.microsoft/usersecrets"
+    - "C:\\Users\\elito\\.nuget\\packages:/home/app/.nuget/packages"
+    - "C:\\Users\\elito\\AppData\\Local\\JetBrains\\RiderRemoteDebugger\\2025.3.2\\\
+      Linux64:/opt/JetBrains/RiderDebuggerTools"
+    - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.3.2\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    - "C:\\Users\\elito\\AppData\\Local\\JetBrains\\Rider2025.3\\log\\DebuggerWorker\\\
+      JetBrains.Debugger.Worker.2026_5_29_21_32_04:/var/opt/JetBrains/RiderDebuggerTools:rw"
+    working_dir: "/app"
+  worker-auction:
+    build:
+      context: "C:\\Dev\\C-Sharp\\Auction-web\\Auction"
+      dockerfile: "src/Auction.Worker/Auction.Worker/Dockerfile"
+      target: "base"
+      args:
+        BUILD_CONFIGURATION: "Debug"
+    command: []
+    entrypoint:
+    - "/opt/JetBrains/RiderDebuggerTools/linux-x64/JetBrains.Debugger.Worker"
+    - "--runtimeconfig"
+    - "/opt/JetBrains/RiderDebuggerTools/JetBrains.Debugger.Worker.runtimeconfig.json"
+    - "--mode=server"
+    - "--frontend-port=57000"
+    - "--backend-port=57200"
+    - "--roslyn-worker-port=57405"
+    - "--timeout=60"
+    environment:
+      RIDER_DEBUGGER_LOG_DIR: "/var/opt/JetBrains/RiderDebuggerTools"
+      RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    image: "auction.worker:dev"
+    ports:
+    - "127.0.0.1:57005:57000"
+    - "127.0.0.1:57205:57200"
+    - "127.0.0.1:57405:57405"
+    volumes:
+    - "C:\\Dev\\C-Sharp\\Auction-web\\Auction\\src\\Auction.Worker\\Auction.Worker:/app:rw"
+    - "C:\\Dev\\C-Sharp\\Auction-web\\Auction:/src:rw"
+    - "C:\\Users\\elito\\AppData\\Roaming\\Microsoft\\UserSecrets:/home/app/.microsoft/usersecrets"
+    - "C:\\Users\\elito\\.nuget\\packages:/home/app/.nuget/packages"
+    - "C:\\Users\\elito\\AppData\\Local\\JetBrains\\RiderRemoteDebugger\\2025.3.2\\\
+      Linux64:/opt/JetBrains/RiderDebuggerTools"
+    - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.3.2\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    - "C:\\Users\\elito\\AppData\\Local\\JetBrains\\Rider2025.3\\log\\DebuggerWorker\\\
+      JetBrains.Debugger.Worker.2026_5_29_21_32_04:/var/opt/JetBrains/RiderDebuggerTools:rw"
+    working_dir: "/app"

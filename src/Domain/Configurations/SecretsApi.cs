@@ -6,4 +6,5 @@ public class SecretsApi
     public string MailPassword { get; set; }
     public string WebUrl { get; set; }
     public string Environment { get; set; }
+    public string ApiKeyTelegram { get; set; }
 }

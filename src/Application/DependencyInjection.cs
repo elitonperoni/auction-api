@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Behaviors;
-using Application.Abstractions.Messaging;
+﻿using Application.Common.Abstractions.Behaviors;
+using Application.Common.Abstractions.Messaging;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel;

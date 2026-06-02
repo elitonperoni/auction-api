@@ -181,6 +181,26 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("condition_product", "public");
                 });
 
+            modelBuilder.Entity("Domain.Entities.NotificationType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_notification_types");
+
+                    b.ToTable("notification_types", "public");
+                });
+
             modelBuilder.Entity("Domain.Entities.ProductDetail", b =>
                 {
                     b.Property<Guid>("Id")
@@ -280,25 +300,48 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("city");
+
+                    b.Property<string>("CompleteName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("complete_name");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("country");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("email");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("first_name");
+                    b.Property<int>("Language")
+                        .HasColumnType("integer")
+                        .HasColumnName("language");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("last_name");
+                    b.Property<DateTime>("LastUpdateDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_update_date");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("password_hash");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("text")
+                        .HasColumnName("phone");
 
                     b.Property<string>("RefreshToken")
                         .HasColumnType("text")
@@ -316,6 +359,26 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("reset_password_expiry");
 
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("state");
+
+                    b.Property<string>("TelegramChatId")
+                        .HasColumnType("text")
+                        .HasColumnName("telegram_chat_id");
+
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("time_zone");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("user_name");
+
                     b.HasKey("Id")
                         .HasName("pk_users");
 
@@ -324,6 +387,33 @@ namespace Infrastructure.Database.Migrations
                         .HasDatabaseName("ix_users_email");
 
                     b.ToTable("users", "public");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserNotification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("NotificationTypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("notification_type_id");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_notifications");
+
+                    b.HasIndex("NotificationTypeId")
+                        .HasDatabaseName("ix_user_notifications_notification_type_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_notifications_user_id");
+
+                    b.ToTable("user_notifications", "public");
                 });
 
             modelBuilder.Entity("Domain.Todos.TodoItem", b =>
@@ -467,6 +557,27 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Auction");
                 });
 
+            modelBuilder.Entity("Domain.Entities.UserNotification", b =>
+                {
+                    b.HasOne("Domain.Entities.NotificationType", "NotificationType")
+                        .WithMany()
+                        .HasForeignKey("NotificationTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_notifications_notification_types_notification_type_id");
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("UserNotifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_notifications_users_user_id");
+
+                    b.Navigation("NotificationType");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Todos.TodoItem", b =>
                 {
                     b.HasOne("Domain.Entities.User", null)
@@ -482,6 +593,11 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Bids");
 
                     b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.Navigation("UserNotifications");
                 });
 #pragma warning restore 612, 618
         }

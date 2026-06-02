@@ -1,13 +1,16 @@
 using System.Reflection;
+using Amazon;
+using Amazon.Runtime;
 using Application;
 using AuctionApi;
-using AuctionApi.Consumer;
 using AuctionApi.Extensions;
 using AuctionApi.Hubs;
+using AuctionApi.Infrastructure;
 using HealthChecks.UI.Client;
 using Infrastructure;
-using MassTransit;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Wolverine;
+using Wolverine.AmazonSqs;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -30,22 +33,9 @@ builder.Services
 
 builder.Services.AddCaching(builder.Configuration);
 
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<BidProcessedConsumer>();
-    x.AddConsumer<NotificationConsumer>();
+builder.AddWolverine(builder.Configuration);
 
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.Host(builder.Configuration["RabbitMq:Host"] ?? "", "/", h => {
-            h.Username(builder.Configuration["RabbitMq:Username"] ?? "");
-            h.Password(builder.Configuration["RabbitMq:Password"] ?? "");
-        });
-
-        cfg.ConfigureEndpoints(context);
-    });
-}
-    );
+builder.Services.ConfigureRateLimiter();
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
@@ -82,6 +72,8 @@ app.MapHealthChecks("health", new HealthCheckOptions
 });
 
 app.UseCookiePolicy();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 

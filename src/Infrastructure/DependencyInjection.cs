@@ -1,24 +1,27 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
+using System.Threading.RateLimiting;
 using Amazon.S3;
-using Application.Abstractions.Authentication;
-using Application.Abstractions.Data;
-using Application.Abstractions.Mail;
-using Application.AuctionUseCases.Services;
-using Application.Interfaces;
-using Application.Mail;
+using Application.Common.Abstractions.Authentication;
+using Application.Common.Abstractions.Data;
+using Application.Common.Abstractions.Mail;
+using Application.Common.Interfaces;
+using Application.Common.Mail;
 using Domain.Configurations;
-using Domain.Interfaces;
 using Infrastructure.Authentication;
 using Infrastructure.Authorization;
 using Infrastructure.Caching;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.ExternalServices;
+using Infrastructure.Filters;
+using Infrastructure.Services;
 using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -64,6 +67,9 @@ public static class DependencyInjection
 
         services.AddScoped<IS3Service, S3Service>();
         services.AddScoped<IAuctionService, AuctionService>();
+        services.AddScoped<ITelegramService, TelegramService>();
+
+        services.AddHttpClient("telegram");
 
         return services;
     }
@@ -80,7 +86,33 @@ public static class DependencyInjection
             ConnectionMultiplexer.Connect(redisConnectionString)
         );
 
-        services.AddScoped<INotificationCacheService, NotificationCacheService>();
+        services.AddScoped<ICacheService, CacheService>();
+
+        return services;
+    }
+
+    public static IServiceCollection ConfigureRateLimiter(this IServiceCollection services)
+    {
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.AddPolicy(PolicyRateLimiter.BidPolicy, httpContext =>
+            {
+                string partitionKey = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                                   ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                                   ?? "unknown";
+
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: partitionKey,
+                    factory: partition => new FixedWindowRateLimiterOptions
+                    {
+                        AutoReplenishment = true,
+                        PermitLimit = 5, 
+                        Window = TimeSpan.FromSeconds(1)
+                    });
+            });
+        });
 
         return services;
     }
@@ -93,7 +125,8 @@ public static class DependencyInjection
         {
             throw new Exception("ALERTA: A Connection String 'RedisConnection' não foi encontrada no appsettings.json!");
         }
-        services.AddSignalR().AddStackExchangeRedis(redisConnectionString);
+
+        services.AddSignalR(options => options.AddFilter<RateLimitingHubFilter>()).AddStackExchangeRedis(redisConnectionString);
 
         return services;
     }

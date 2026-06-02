@@ -1,6 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using Application.Interfaces;
+using Application.Common.Interfaces;
 using Domain.Configurations;
 using Microsoft.Extensions.Options;
 using SharedKernel;
