@@ -4,13 +4,12 @@ using Application.Common.Interfaces;
 using Application.Features.Auctions.Commands.SendBid;
 using Domain.Events;
 using SharedKernel;
-using Wolverine.Attributes;
 
 namespace Auction.Worker.Consumer;
 
 public class BidPlacedHandler(
     ICommandHandler<SendBidCommand, SendBidDtoResponse> handler,
-    INotificationCacheService notificationCacheService)
+    ICacheService cacheService)
 {
     public async Task<object> Handle(BidPlaced msg, CancellationToken cancellationToken)
     {
@@ -30,7 +29,7 @@ public class BidPlacedHandler(
                 responseBid.Error.Description);
         }
 
-        await notificationCacheService.AddNotificationAsync(responseBid.Value.AuctionOwnerId, new NotificationItem
+        await cacheService.AddNotificationAsync(responseBid.Value.AuctionOwnerId, new NotificationItem
         {
             AuctionId = command.AuctionId,
             Message = responseBid.Value.MessageToOwner

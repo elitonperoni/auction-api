@@ -7,7 +7,7 @@ using Application.Common.DTOs;
 
 namespace Application.Common.Interfaces;
 
-public interface INotificationCacheService
+public interface ICacheService
 {
     Task AddNotificationAsync(Guid userId, NotificationItem notification);
     Task<Guid?> ConsumeLinkTokenTelegram(string token);

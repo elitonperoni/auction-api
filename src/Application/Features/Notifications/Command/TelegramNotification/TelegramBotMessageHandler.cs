@@ -6,7 +6,7 @@ using SharedKernel;
 
 namespace Application.Features.Notifications.Command.TelegramNotification;
 
-internal sealed class TelegramBotMessageHandler(INotificationCacheService notificationCacheService,
+internal sealed class TelegramBotMessageHandler(ICacheService cacheService,
     ICommandHandler<LinkTelegramAccountCommand, bool> userCommandHandler) : ICommandHandler<TelegramBotMessageCommand, bool>
 {
     public async Task<Result<bool>> Handle(TelegramBotMessageCommand command, CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ internal sealed class TelegramBotMessageHandler(INotificationCacheService notifi
 
     private async Task ProcessLinkTokenAsync(long chatId, string token, CancellationToken cancellationToken)
     {
-        Guid? userId = await notificationCacheService.ConsumeLinkTokenTelegram(token);
+        Guid? userId = await cacheService.ConsumeLinkTokenTelegram(token);
 
         if (userId.HasValue)
         {   

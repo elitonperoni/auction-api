@@ -12,7 +12,7 @@ using SharedKernel;
 namespace Application.Features.Users.Queries.GetNotifications;
 
 internal sealed class GetNotificationsQueryHandler(
-    INotificationCacheService notificationCacheService,
+    ICacheService cacheService,
     IUserContext userContext)
     : IQueryHandler<GetNotificationsQuery, List<NotificationItem>>
 {
@@ -20,7 +20,7 @@ internal sealed class GetNotificationsQueryHandler(
     {
         Guid userId = userContext.UserId;
 
-        List<NotificationItem> notificationItems = await notificationCacheService.GetNotificationsAsync(userId);
+        List<NotificationItem> notificationItems = await cacheService.GetNotificationsAsync(userId);
 
         return Result.Success(notificationItems);
     }

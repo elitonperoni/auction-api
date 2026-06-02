@@ -86,7 +86,7 @@ public static class DependencyInjection
             ConnectionMultiplexer.Connect(redisConnectionString)
         );
 
-        services.AddScoped<INotificationCacheService, NotificationCacheService>();
+        services.AddScoped<ICacheService, CacheService>();
 
         return services;
     }

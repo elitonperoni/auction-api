@@ -7,7 +7,7 @@ using StackExchange.Redis;
 
 namespace Infrastructure.Caching;
 
-public class NotificationCacheService(IConnectionMultiplexer redis, IUserContext userContext) : INotificationCacheService
+public class CacheService(IConnectionMultiplexer redis, IUserContext userContext) : ICacheService
 {
     private const int MaxNotificationsPerUser = 50;
 
