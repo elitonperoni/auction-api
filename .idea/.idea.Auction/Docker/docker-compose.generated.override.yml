@@ -15,7 +15,7 @@ services:
     - "--mode=server"
     - "--frontend-port=57000"
     - "--backend-port=57200"
-    - "--roslyn-worker-port=57404"
+    - "--roslyn-worker-port=53034"
     - "--timeout=60"
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
@@ -23,9 +23,9 @@ services:
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "webapi:dev"
     ports:
-    - "127.0.0.1:57004:57000"
-    - "127.0.0.1:57204:57200"
-    - "127.0.0.1:57404:57404"
+    - "127.0.0.1:53032:57000"
+    - "127.0.0.1:53033:57200"
+    - "127.0.0.1:53034:53034"
     volumes:
     - "C:\\Dev\\C-Sharp\\Auction-web\\Auction\\src\\AuctionApi:/app:rw"
     - "C:\\Dev\\C-Sharp\\Auction-web\\Auction:/src:rw"
@@ -35,7 +35,7 @@ services:
       Linux64:/opt/JetBrains/RiderDebuggerTools"
     - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.3.2\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     - "C:\\Users\\elito\\AppData\\Local\\JetBrains\\Rider2025.3\\log\\DebuggerWorker\\\
-      JetBrains.Debugger.Worker.2026_5_29_21_32_04:/var/opt/JetBrains/RiderDebuggerTools:rw"
+      JetBrains.Debugger.Worker.2026_6_13_16_00_15:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"
   worker-auction:
     build:
@@ -52,16 +52,16 @@ services:
     - "--mode=server"
     - "--frontend-port=57000"
     - "--backend-port=57200"
-    - "--roslyn-worker-port=57405"
+    - "--roslyn-worker-port=53037"
     - "--timeout=60"
     environment:
       RIDER_DEBUGGER_LOG_DIR: "/var/opt/JetBrains/RiderDebuggerTools"
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "auction.worker:dev"
     ports:
-    - "127.0.0.1:57005:57000"
-    - "127.0.0.1:57205:57200"
-    - "127.0.0.1:57405:57405"
+    - "127.0.0.1:53035:57000"
+    - "127.0.0.1:53036:57200"
+    - "127.0.0.1:53037:53037"
     volumes:
     - "C:\\Dev\\C-Sharp\\Auction-web\\Auction\\src\\Auction.Worker\\Auction.Worker:/app:rw"
     - "C:\\Dev\\C-Sharp\\Auction-web\\Auction:/src:rw"
@@ -71,5 +71,5 @@ services:
       Linux64:/opt/JetBrains/RiderDebuggerTools"
     - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.3.2\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     - "C:\\Users\\elito\\AppData\\Local\\JetBrains\\Rider2025.3\\log\\DebuggerWorker\\\
-      JetBrains.Debugger.Worker.2026_5_29_21_32_04:/var/opt/JetBrains/RiderDebuggerTools:rw"
+      JetBrains.Debugger.Worker.2026_6_13_16_00_15:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"

@@ -56,6 +56,8 @@ public static class DependencyInjection
 
         IConfigurationSection awsSection = configuration.GetSection("AWS");
         services.Configure<AwsConfig>(awsSection);
+        services.Configure<StripeConfig>(configuration.GetSection("Stripe"));
+
         var credentials = new Amazon.Runtime.BasicAWSCredentials(
             awsSection["AccessKey"],
             awsSection["SecretKey"]
@@ -68,8 +70,17 @@ public static class DependencyInjection
         services.AddScoped<IS3Service, S3Service>();
         services.AddScoped<IAuctionService, AuctionService>();
         services.AddScoped<ITelegramService, TelegramService>();
+        services.AddScoped<IStripeService, StripeService>();
 
         services.AddHttpClient("telegram");
+        services.AddHttpClient("stripe", (serviceProvider, client) =>
+        {
+            StripeConfig stripeConfig = serviceProvider
+                .GetRequiredService<Microsoft.Extensions.Options.IOptions<StripeConfig>>()
+                .Value;
+
+            client.BaseAddress = new Uri(stripeConfig.BaseUrl);
+        });
 
         return services;
     }

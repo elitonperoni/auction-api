@@ -1,7 +1,7 @@
-﻿using Amazon;
+﻿using System.Globalization;
+using Amazon;
 using Amazon.Runtime;
 using JasperFx.Core;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
 using Wolverine.AmazonSqs;
@@ -15,6 +15,7 @@ public static class WolverineConfiguration
         this HostApplicationBuilder builder,
         IConfiguration configuration)
     {
+        string prefix = configuration["AWS:PrefixQueue"];
         builder.UseWolverine(opts =>
         {
             opts.UseAmazonSqsTransport(sqs =>
@@ -27,7 +28,11 @@ public static class WolverineConfiguration
                     configuration["AWS:SecretKey"]);
             })
             .AutoProvision()
-            .UseConventionalRouting();
+            .UseConventionalRouting(routing =>
+            {
+                routing.QueueNameForSender(t => $"{prefix}-{t.Name.ToLower(CultureInfo.CurrentCulture)}");
+                routing.QueueNameForListener(t => $"{prefix}-{t.Name.ToLower(CultureInfo.CurrentCulture)}");
+            });
 
             opts.RestoreV5Defaults();
 

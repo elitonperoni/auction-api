@@ -14,7 +14,7 @@ internal sealed class Register : IEndpoint
     {
         app.MapPost("users/register", async (
             Request request,
-            ICommandHandler<RegisterUserCommand, Guid> handler,
+            ICommandHandler<RegisterUserCommand, RegisterUserResponse> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new RegisterUserCommand(
@@ -23,7 +23,7 @@ internal sealed class Register : IEndpoint
                 request.LastName,
                 request.Password);
 
-            Result<Guid> result = await handler.Handle(command, cancellationToken);
+            Result<RegisterUserResponse> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })

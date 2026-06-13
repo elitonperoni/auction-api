@@ -13,17 +13,8 @@ services:
       - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false
     networks:
       - auction-network
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    restart: always
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    networks:
-      - auction-network
-
+    
+    
   worker-auction:
     container_name: worker-auction
     restart: always
@@ -36,9 +27,7 @@ services:
       - MT_LICENSE=Community   
       - DOTNET_ENVIRONMENT=Development
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false
-    depends_on:
-      - rabbitmq         
+      - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false      
     networks:
       - auction-network
 
