@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Net.Mail;
 using Application.Common.Abstractions.Authentication;
 using Application.Common.Abstractions.Data;
@@ -24,20 +25,19 @@ internal sealed class RegisterUserCommandHandler(
             return Result.Failure<RegisterUserResponse>(UserErrors.EmailNotUnique);
         }
 
-        //TODO: ADJUSTMENT SAVE USER
         var user = new User
         {
             Id = Guid.NewGuid(),
             Email = command.Email,
-            UserName = command.FirstName,
-            CompleteName = $"{command.FirstName} {command.LastName}",
+            UserName = command.UserName,
+            CompleteName = command.FullName,
             PasswordHash = passwordHasher.Hash(command.Password),
             CreatedAt = DateTime.UtcNow,
-            Language = 1,
-            Country = "BR",
-            State = "PR",
-            City = "Curitiba",
-            TimeZone = "America/Sao_Paulo"
+            Language = int.Parse(command.Language, CultureInfo.InvariantCulture),
+            Country = command.Country,
+            State = command.State,
+            City = command.City,
+            TimeZone = command.Timezone
         };
 
         user.Raise(new UserRegisteredDomainEvent(user.Id));

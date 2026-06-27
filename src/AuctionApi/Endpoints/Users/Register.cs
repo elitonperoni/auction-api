@@ -8,7 +8,9 @@ namespace AuctionApi.Endpoints.Users;
 
 internal sealed class Register : IEndpoint
 {
-    public sealed record Request(string Email, string FirstName, string LastName, string Password);
+    public sealed record Request(string Email, string FullName, string UserName,
+        string Phone, string Location, string Country, string State, string City,
+        string Language, string Timezone, string Password);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -19,8 +21,15 @@ internal sealed class Register : IEndpoint
         {
             var command = new RegisterUserCommand(
                 request.Email,
-                request.FirstName,
-                request.LastName,
+                request.FullName,
+                request.UserName,
+                request.Phone, 
+                request.Location,
+                request.Country,
+                request.State,
+                request.City,
+                request.Language,
+                request.Timezone,
                 request.Password);
 
             Result<RegisterUserResponse> result = await handler.Handle(command, cancellationToken);
