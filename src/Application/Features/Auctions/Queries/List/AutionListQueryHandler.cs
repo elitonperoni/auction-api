@@ -46,12 +46,18 @@ internal sealed class AutionListQueryHandler(
                     .Include(p => p.User)
                     .AsQueryable();
 
-        if (!string.IsNullOrEmpty(query.SearchTerm))
+        if (!string.IsNullOrWhiteSpace(query.SearchTerm))
         {
-            string searchTerm = $"%{query.SearchTerm.ToLower(CultureInfo.CurrentCulture)}%";
+            string searchTerm = query.SearchTerm.Trim();
+            string likePattern = $"%{searchTerm}%";
 
-            auctionQuery = auctionQuery.Where(p => p.ProductDetail != null && (EF.Functions.Like(p.Title.ToLower(CultureInfo.CurrentCulture), searchTerm)
-            || EF.Functions.Like(p.ProductDetail.Description.ToLower(CultureInfo.CurrentCulture), searchTerm)));
+            auctionQuery = auctionQuery.Where(auction =>
+                EF.Functions.ILike(auction.Title, likePattern) ||
+                    auction.ProductDetail != null &&
+                    EF.Functions.ILike(
+                        auction.ProductDetail.Description,
+                        likePattern)
+                );
         }
 
         auctionQuery = auctionQuery.OrderBy(p => p.EndDate);
