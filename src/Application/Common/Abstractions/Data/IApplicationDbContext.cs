@@ -1,5 +1,4 @@
 ﻿using Domain.Entities;
-using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -9,7 +8,6 @@ namespace Application.Common.Abstractions.Data;
 public interface IApplicationDbContext
 {
     DbSet<User> Users { get; }
-    DbSet<TodoItem> TodoItems { get; }
     DbSet<Auction> Auctions { get; }
     DbSet<ProductPhoto> ProductPhotos { get; }
     DbSet<Bid> Bids { get; }

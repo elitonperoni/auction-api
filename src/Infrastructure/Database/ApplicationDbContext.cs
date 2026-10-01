@@ -1,7 +1,6 @@
 ﻿using Application.Common.Abstractions.Data;
 using Domain;
 using Domain.Entities;
-using Domain.Todos;
 using Infrastructure.DomainEvents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -17,7 +16,6 @@ public sealed class ApplicationDbContext(
 {
     public DbSet<User> Users { get; set; }
 
-    public DbSet<TodoItem> TodoItems { get; set; }
     public DbSet<Auction> Auctions { get; set; }
     public DbSet<Bid> Bids { get; set; }
     public DbSet<ProductPhoto> ProductPhotos { get; set; }

@@ -6,4 +6,7 @@ public static class ChannelNames
     public const string SendBid = "SendBid";
     public const string ReceiveNotification = "ReceiveNotification";
     public const string ReceiveUserNotification = "ReceiveUserNotification";
+    public const string ReceiveMessage = "ReceiveMessage";
+    public const string BidError = "BidError";
+    public const string FullAuctionState = "FullAuctionState";
 }

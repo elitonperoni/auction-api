@@ -16,7 +16,6 @@ using Infrastructure.DomainEvents;
 using Infrastructure.ExternalServices;
 using Infrastructure.Filters;
 using Infrastructure.Services;
-using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -48,8 +47,6 @@ public static class DependencyInjection
 
     private static IServiceCollection AddServices(this IServiceCollection services,  IConfiguration configuration)
     {
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
         services.Configure<SecretsApi>(configuration.GetSection("SecretsApi"));        

@@ -1,8 +1,9 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
+using Application.Common.Abstractions.Messaging;
+using Application.Features.Auctions.Queries.GetDetail;
 using Domain.Events;
-using MassTransit;
+using Infrastructure;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using SharedKernel;
 using Wolverine;
@@ -10,79 +11,65 @@ using Wolverine;
 namespace AuctionApi.Hubs;
 
 [Authorize]
-public class AuctionHub(IMessageBus bus) : Hub
+public class AuctionHub(
+    IMessageBus bus,
+    IQueryHandler<GetDetailProductQuery, GetDetailProductResponse> getDetailHandler) : Hub
 {
     public async Task SendBid(string groupName, string bidValueString)
     {
-        Guid? userId = Guid.Parse(Context?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
-
-        if (userId == Guid.Empty)
+        if (!Guid.TryParse(Context.User?.FindFirstValue(ClaimTypes.NameIdentifier), out Guid userId))
         {
-            await Clients.Caller.SendAsync("BidError", "Usuário não autenticado.");
+            await Clients.Caller.SendAsync(ChannelNames.BidError, "Usuário não autenticado.");
+            return;
+        }
+
+        if (!Guid.TryParse(groupName, out Guid auctionId))
+        {
+            await Clients.Caller.SendAsync(ChannelNames.BidError, "Leilão inválido.");
             return;
         }
 
         if (!decimal.TryParse(bidValueString, out decimal bidAmount))
         {
-            await Clients.Caller.SendAsync("BidError", "Valor do lance inválido.");
+            await Clients.Caller.SendAsync(ChannelNames.BidError, "Valor do lance inválido.");
             return;
         }
 
         await bus.SendAsync(
             new BidPlaced(
-                Context?.ConnectionId?.ToString() ?? "",
-                Guid.Parse(groupName),
-                userId.Value,
+                Context.ConnectionId,
+                auctionId,
+                userId,
                 bidAmount,
                 DateTime.UtcNow));
     }
 
-    //private async Task LoadTest(decimal bidAmount, string groupName, Guid userId)
-    //{
-    //    List<Task> listTasks = [];
-
-    //    decimal mockBidAmount = bidAmount;
-
-    //    DateTime dateTime = DateTime.UtcNow;
-    //    for (int i = 0; i < 50; i++)
-    //    {
-    //        mockBidAmount += 500m;
-    //        listTasks.Add(publishEndpoint.Publish(new BidPlaced(Guid.Parse(groupName), userId, mockBidAmount, dateTime)));
-    //    }
-
-    //    await Task.WhenAll(listTasks);
-    //}
-
     public async Task JoinAuctionGroup(string groupName)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        await Clients.Caller.SendAsync("ReceiveMessage", "AuctionHub", $"Você entrou no leilão: {groupName}");
+        await Clients.Caller.SendAsync(ChannelNames.ReceiveMessage, nameof(AuctionHub), $"Você entrou no leilão: {groupName}");
     }
 
     public async Task JoinUserGroup(string groupName)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, groupName);        
+        await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
     }
 
     public async Task SyncAuctionState(string auctionId)
     {
-        // 1. Buscar o estado ATUAL do banco (via serviço)
-        //Result<Guid> response = await handler.Handle(new CreateAuctionBidCommand
-        //{
-        //    AuctionId = Guid.Parse(auctionId),
-        //    UserId = Guid.Empty,
-        //    BidPrice = 0m,
-        //}, CancellationToken.None);
+        if (!Guid.TryParse(auctionId, out Guid id))
+        {
+            return;
+        }
 
-        //if (response != null)
-        //{
-            // 2. Enviar o estado SÓ PARA O CLIENTE QUE PEDIU
-            await Clients.Caller.SendAsync("FullAuctionState", Guid.NewGuid().ToString());
-        //}
-    }
+        Result<GetDetailProductResponse> result =
+            await getDetailHandler.Handle(new GetDetailProductQuery(id), Context.ConnectionAborted);
 
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        await base.OnDisconnectedAsync(exception);
+        if (result.IsFailure || result.Value.Id == Guid.Empty)
+        {
+            return;
+        }
+
+        await Clients.Caller.SendAsync(ChannelNames.FullAuctionState, result.Value, Context.ConnectionAborted);
     }
 }
