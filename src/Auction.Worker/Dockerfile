@@ -12,14 +12,14 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Directory.Packages.props", "."]
 COPY ["Directory.Build.props", "."]
-COPY ["src/Auction.Worker/Auction.Worker/Auction.Worker.csproj", "src/Auction.Worker/Auction.Worker/"]
+COPY ["src/Auction.Worker/Auction.Worker.csproj", "src/Auction.Worker/"]
 COPY ["src/Application/Application.csproj", "src/Application/"]
 COPY ["src/Domain/Domain.csproj", "src/Domain/"]
 COPY ["src/SharedKernel/SharedKernel.csproj", "src/SharedKernel/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
-RUN dotnet restore "./src/Auction.Worker/Auction.Worker/Auction.Worker.csproj"
+RUN dotnet restore "./src/Auction.Worker/Auction.Worker.csproj"
 COPY . .
-WORKDIR "/src/src/Auction.Worker/Auction.Worker"
+WORKDIR "/src/src/Auction.Worker"
 RUN dotnet build "./Auction.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage

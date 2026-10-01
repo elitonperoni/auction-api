@@ -15,16 +15,11 @@ builder.Configuration
 
 builder.Services
     .AddApplication()
-    .AddInfrastructure(
-        builder.Configuration,
-        builder.Environment.IsDevelopment());
+    .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddCaching(builder.Configuration);
 
 builder.AddWolverine(builder.Configuration);
-
-builder.Services.AddRouting(); 
-builder.Services.AddAuthorization();
 
 IHost host = builder.Build();
 

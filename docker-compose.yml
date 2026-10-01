@@ -20,7 +20,7 @@ services:
     restart: always
     build:
       context: .           
-      dockerfile: src/Auction.Worker/Auction.Worker/Dockerfile
+      dockerfile: src/Auction.Worker/Dockerfile
     #deploy:
       #replicas: 2
     environment:

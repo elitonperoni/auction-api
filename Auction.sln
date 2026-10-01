@@ -28,7 +28,7 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionApi", "src\AuctionApi\AuctionApi.csproj", "{151537D5-C81C-A5FF-56E3-3DD75652ACF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auction.Worker", "src\Auction.Worker\Auction.Worker\Auction.Worker.csproj", "{BF4682ED-D64D-7E45-E0FA-6AB47C144967}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auction.Worker", "src\Auction.Worker\Auction.Worker.csproj", "{BF4682ED-D64D-7E45-E0FA-6AB47C144967}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

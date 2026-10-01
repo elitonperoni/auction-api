@@ -28,16 +28,24 @@ namespace Infrastructure;
 
 public static class DependencyInjection
 {
+    /// <summary>Services shared by every host (API and Worker).</summary>
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration,
-        bool isDevelopment) =>
+        IConfiguration configuration) =>
         services
             .AddServices(configuration)
             .AddDatabase(configuration)
             .AddHealthChecks(configuration)
-            .AddAuthenticationInternal(configuration, isDevelopment)
-            .AddAuthorizationInternal();
+            .AddSecurityServices();
+
+    /// <summary>JWT bearer authentication, cookie policy and authorization. Web hosts only.</summary>
+    public static IServiceCollection AddWebAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        bool isDevelopment) =>
+        services
+            .AddJwtAuthentication(configuration, isDevelopment)
+            .AddAuthorization();
 
     private static IServiceCollection AddServices(this IServiceCollection services,  IConfiguration configuration)
     {
@@ -62,6 +70,7 @@ public static class DependencyInjection
         services.AddScoped<IAuctionService, AuctionService>();
         services.AddScoped<ITelegramService, TelegramService>();
         services.AddScoped<IStripeService, StripeService>();
+        services.AddSingleton<IMailSender, MailSender>();
 
         services.AddHttpClient(TelegramService.HttpClientName);
         services.AddHttpClient(StripeService.HttpClientName, (serviceProvider, client) =>
@@ -133,7 +142,19 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddAuthenticationInternal(
+    private static IServiceCollection AddSecurityServices(this IServiceCollection services)
+    {
+        services.AddHttpContextAccessor();
+
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddSingleton<ITokenProvider, TokenProvider>();
+
+        services.AddScoped<IUserContext, UserContext>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddJwtAuthentication(
         this IServiceCollection services,
         IConfiguration configuration, bool isDevelopment)
     {
@@ -176,21 +197,6 @@ public static class DependencyInjection
                 }
             };
         });
-
-        services.AddHttpContextAccessor();
-
-        services.AddSingleton<IPasswordHasher, PasswordHasher>();
-        services.AddSingleton<ITokenProvider, TokenProvider>();
-        services.AddSingleton<IMailSender, MailSender>();
-
-        services.AddScoped<IUserContext, UserContext>();        
-
-        return services;
-    }
-
-    private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
-    {
-        services.AddAuthorization();
 
         return services;
     }

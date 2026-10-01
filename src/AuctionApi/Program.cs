@@ -23,9 +23,8 @@ builder.Services.AddSwaggerGenWithAuth();
 builder.Services
     .AddApplication()
     .AddPresentation()
-    .AddInfrastructure(
-        builder.Configuration, 
-        builder.Environment.IsDevelopment());
+    .AddInfrastructure(builder.Configuration)
+    .AddWebAuthentication(builder.Configuration, builder.Environment.IsDevelopment());
 
 builder.Services.AddCaching(builder.Configuration);
 
