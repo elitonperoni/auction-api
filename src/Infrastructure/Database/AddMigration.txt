@@ -1,3 +1,0 @@
-﻿Add-Migration AddPhotoProducts -Context Infrastructure.Database.ApplicationDbContext
-
-Update-Database -Context Infrastructure.Database.ApplicationDbContext

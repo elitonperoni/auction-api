@@ -24,7 +24,6 @@ services:
     #deploy:
       #replicas: 2
     environment:
-      - MT_LICENSE=Community   
       - DOTNET_ENVIRONMENT=Development
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false      
@@ -50,7 +49,6 @@ services:
     networks:
       - auction-network
 
-# 1. Definir a rede no escopo global
 networks:
   auction-network:
     driver: bridge

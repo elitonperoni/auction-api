@@ -2,7 +2,6 @@
 using Application.Common.Abstractions.Authentication;
 using Application.Common.DTOs;
 using Application.Common.Interfaces;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 
 namespace Infrastructure.Caching;
