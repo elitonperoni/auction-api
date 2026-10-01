@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Domain.Entities;
-
-namespace Application.Features.Users.Queries.GetById;
+﻿namespace Application.Features.Users.Queries.GetById;
 
 public sealed record UserResponse
 {

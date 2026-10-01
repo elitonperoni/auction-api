@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using Application.Common.Abstractions.Messaging;
+﻿using Application.Common.Abstractions.Messaging;
 
 namespace Application.Features.Auctions.Commands.Create;
 

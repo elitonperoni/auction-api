@@ -1,14 +1,7 @@
-
-using Amazon;
-using Amazon.Runtime;
 using Application;
-using Infrastructure;
-using JasperFx.Core;
-using Microsoft.EntityFrameworkCore;
-using Wolverine;
-using Wolverine.AmazonSqs;
-using Wolverine.ErrorHandling;
 using Auction.Worker.Infrastructure;
+using Infrastructure;
+using Wolverine;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 

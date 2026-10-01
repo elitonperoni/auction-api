@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Features.Auctions.Queries.GetDetail;
+﻿namespace Application.Features.Auctions.Queries.GetDetail;
 
 public sealed class GetDetailProductResponse
 {

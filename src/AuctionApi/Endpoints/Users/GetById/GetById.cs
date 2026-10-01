@@ -1,8 +1,8 @@
-﻿using SharedKernel;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Users.Queries.GetById;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
-using Application.Features.Users.Queries.GetById;
-using Application.Common.Abstractions.Messaging;
+using SharedKernel;
 
 namespace AuctionApi.Endpoints.Users.GetById;
 
@@ -21,7 +21,7 @@ internal sealed class GetById : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .HasPermission(Permissions.UsersAccess)
+        .RequireAuthorization()
         .WithTags(Tags.Users);
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System.Globalization;
-using System.Net;
-using System.Net.Mail;
 using Application.Common.Abstractions.Authentication;
 using Application.Common.Abstractions.Data;
 using Application.Common.Abstractions.Messaging;
@@ -39,8 +37,6 @@ internal sealed class RegisterUserCommandHandler(
             City = command.City,
             TimeZone = command.Timezone
         };
-
-        user.Raise(new UserRegisteredDomainEvent(user.Id));
 
         context.Users.Add(user);
 

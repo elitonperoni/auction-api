@@ -1,8 +1,8 @@
-﻿using SharedKernel;
+﻿using Application.Common.Abstractions.Messaging;
+using Application.Features.Users.Command.Register;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
-using Application.Features.Users.Command.Register;
-using Application.Common.Abstractions.Messaging;
+using SharedKernel;
 
 namespace AuctionApi.Endpoints.Users;
 

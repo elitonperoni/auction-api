@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using Infrastructure.Database;
+using Application.Common.Abstractions.Messaging;
 using AuctionApi;
 using Domain.Entities;
-using Application.Common.Abstractions.Messaging;
+using Infrastructure.Database;
 
 namespace ArchitectureTests;
 

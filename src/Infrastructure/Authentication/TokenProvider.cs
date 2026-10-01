@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Common.Abstractions.Authentication;
@@ -47,15 +48,16 @@ internal sealed class TokenProvider(IConfiguration configuration) : ITokenProvid
         return Convert.ToBase64String(randomNumber);
     }
 
+    [SuppressMessage("Security", "CA5404", Justification = "The refresh flow must read claims from an expired access token; signature, issuer and audience are still validated.")]
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false,
-            ValidateIssuer = false,
+            ValidIssuer = configuration["Jwt:Issuer"],
+            ValidAudience = configuration["Jwt:Audience"],
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
-            ValidateLifetime = false 
+            ValidateLifetime = false
         };
 
         var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Application.Common.Abstractions.Authentication;
+﻿using Application.Common.Abstractions.Authentication;
 using Application.Common.Abstractions.Data;
 using Application.Common.Abstractions.Messaging;
 using Application.Common.Enums;

@@ -1,11 +1,11 @@
-﻿using Application.Common.Abstractions.Messaging;
+using Application.Common.Abstractions.Messaging;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
 using SharedKernel;
 
 namespace Application.Common.Abstractions.Behaviors;
 
-internal static class LoggingDecorator
+internal static partial class LoggingDecorator
 {
     internal sealed class CommandHandler<TCommand, TResponse>(
         ICommandHandler<TCommand, TResponse> innerHandler,
@@ -17,21 +17,11 @@ internal static class LoggingDecorator
         {
             string commandName = typeof(TCommand).Name;
 
-            logger.LogInformation("Processing command {Command}", commandName);
+            LogProcessing(logger, "command", commandName);
 
             Result<TResponse> result = await innerHandler.Handle(command, cancellationToken);
 
-            if (result.IsSuccess)
-            {
-                logger.LogInformation("Completed command {Command}", commandName);
-            }
-            else
-            {
-                using (LogContext.PushProperty("Error", result.Error, true))
-                {
-                    logger.LogError("Completed command {Command} with error", commandName);
-                }
-            }
+            LogCompletion(logger, "command", commandName, result);
 
             return result;
         }
@@ -47,21 +37,11 @@ internal static class LoggingDecorator
         {
             string commandName = typeof(TCommand).Name;
 
-            logger.LogInformation("Processing command {Command}", commandName);
+            LogProcessing(logger, "command", commandName);
 
             Result result = await innerHandler.Handle(command, cancellationToken);
 
-            if (result.IsSuccess)
-            {
-                logger.LogInformation("Completed command {Command}", commandName);
-            }
-            else
-            {
-                using (LogContext.PushProperty("Error", result.Error, true))
-                {
-                    logger.LogError("Completed command {Command} with error", commandName);
-                }
-            }
+            LogCompletion(logger, "command", commandName, result);
 
             return result;
         }
@@ -77,23 +57,36 @@ internal static class LoggingDecorator
         {
             string queryName = typeof(TQuery).Name;
 
-            logger.LogInformation("Processing query {Query}", queryName);
+            LogProcessing(logger, "query", queryName);
 
             Result<TResponse> result = await innerHandler.Handle(query, cancellationToken);
 
-            if (result.IsSuccess)
-            {
-                logger.LogInformation("Completed query {Query}", queryName);
-            }
-            else
-            {
-                using (LogContext.PushProperty("Error", result.Error, true))
-                {
-                    logger.LogError("Completed query {Query} with error", queryName);
-                }
-            }
+            LogCompletion(logger, "query", queryName, result);
 
             return result;
         }
     }
+
+    private static void LogCompletion(ILogger logger, string kind, string name, Result result)
+    {
+        if (result.IsSuccess)
+        {
+            LogCompleted(logger, kind, name);
+            return;
+        }
+
+        using (LogContext.PushProperty("Error", result.Error, true))
+        {
+            LogCompletedWithError(logger, kind, name);
+        }
+    }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Processing {Kind} {Name}")]
+    private static partial void LogProcessing(ILogger logger, string kind, string name);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Completed {Kind} {Name}")]
+    private static partial void LogCompleted(ILogger logger, string kind, string name);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Completed {Kind} {Name} with error")]
+    private static partial void LogCompletedWithError(ILogger logger, string kind, string name);
 }

@@ -23,7 +23,7 @@ internal sealed class SendUserMessageTelegramHandler(IApplicationDbContext conte
 
             if (!string.IsNullOrEmpty(chatId))
             {
-                await telegramService.SendMessage(chatId, command.Message);
+                await telegramService.SendMessageAsync(chatId, command.Message, cancellationToken);
             }
         }
         return true;

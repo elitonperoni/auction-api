@@ -2,7 +2,6 @@
 using Application.Features.Users.Command.Login;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using SharedKernel.Consts;
 

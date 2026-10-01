@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Domain.Users;
 using SharedKernel;
 
@@ -14,7 +8,8 @@ internal sealed class LinkTelegramAccountDomainEventHandler(ITelegramService tel
 {
     public async Task Handle(UserLinkTelegramDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        string message = "✅ Sua conta foi vinculada com sucesso! A partir de agora você receberá seus alertas aqui." ;        
-        await telegramService.SendMessage(domainEvent.ChatId, message);
+        const string message = "✅ Your account has been linked successfully! From now on you will receive your alerts here.";
+
+        await telegramService.SendMessageAsync(domainEvent.ChatId, message, cancellationToken);
     }
 }

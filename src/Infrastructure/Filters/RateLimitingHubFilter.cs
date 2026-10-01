@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Infrastructure.Filters;
 

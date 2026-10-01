@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Features.Auctions.Queries.BidsByUser;
+﻿namespace Application.Features.Auctions.Queries.BidsByUser;
 
 public sealed class AuctionBidsByUserResponse
 {

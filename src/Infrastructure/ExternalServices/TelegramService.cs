@@ -1,40 +1,63 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net.Http.Json;
 using Application.Common.Interfaces;
 using Domain.Configurations;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Infrastructure.ExternalServices;
 
-public class TelegramService(IHttpClientFactory httpFactory, IOptions<SecretsApi> options) : ITelegramService
+internal sealed partial class TelegramService(
+    IHttpClientFactory httpFactory,
+    IOptions<SecretsApi> options,
+    ILogger<TelegramService> logger) : ITelegramService
 {
-    private readonly HttpClient _http = httpFactory.CreateClient("telegram");
+    public const string HttpClientName = "telegram";
+
+    private readonly HttpClient _http = httpFactory.CreateClient(HttpClientName);
+
     private string ApiUrl => $"https://api.telegram.org/bot{options.Value.ApiKeyTelegram}";
-    public async Task SendMessage(string chatId, string mensagem)
+
+    public Task SendMessageAsync(string chatId, string message, CancellationToken cancellationToken = default)
     {
-        await PostAsync("sendMessage", new
+        if (!long.TryParse(chatId, NumberStyles.Integer, CultureInfo.InvariantCulture, out long parsedChatId))
         {
-            chat_id = long.Parse(chatId, CultureInfo.InvariantCulture),
-            text = mensagem,
+            LogInvalidChatId(logger, chatId);
+            return Task.CompletedTask;
+        }
+
+        return PostAsync("sendMessage", new
+        {
+            chat_id = parsedChatId,
+            text = message,
             parse_mode = "HTML"
-        });
+        }, cancellationToken);
     }
 
-    private async Task PostAsync(string metodo, object payload)
+    private async Task PostAsync(string method, object payload, CancellationToken cancellationToken)
     {
         try
         {
-            HttpResponseMessage response = await _http.PostAsJsonAsync($"{ApiUrl}/{metodo}", payload);
+            using HttpResponseMessage response = await _http.PostAsJsonAsync($"{ApiUrl}/{method}", payload, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
-                string erro = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"[Telegram] Erro ao chamar {metodo}: {erro}");
+                string error = await response.Content.ReadAsStringAsync(cancellationToken);
+                LogRequestFailed(logger, method, (int)response.StatusCode, error);
             }
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
-            Console.WriteLine($"[Telegram] Exceção: {ex.Message}");
+            LogRequestException(logger, ex, method);
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid Telegram chat id '{ChatId}'")]
+    private static partial void LogInvalidChatId(ILogger logger, string chatId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Telegram API call '{Method}' failed with status {StatusCode}: {Error}")]
+    private static partial void LogRequestFailed(ILogger logger, string method, int statusCode, string error);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Telegram API call '{Method}' threw an exception")]
+    private static partial void LogRequestException(ILogger logger, Exception exception, string method);
 }

@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-using System.Text;
-using System.Threading.RateLimiting;
+﻿using System.Text;
 using Amazon.S3;
 using Application.Common.Abstractions.Authentication;
 using Application.Common.Abstractions.Data;
@@ -9,7 +7,6 @@ using Application.Common.Interfaces;
 using Application.Common.Mail;
 using Domain.Configurations;
 using Infrastructure.Authentication;
-using Infrastructure.Authorization;
 using Infrastructure.Caching;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
@@ -17,7 +14,6 @@ using Infrastructure.ExternalServices;
 using Infrastructure.Filters;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
@@ -26,7 +22,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SharedKernel;
 using SharedKernel.Consts;
 using StackExchange.Redis;
 
@@ -69,7 +64,7 @@ public static class DependencyInjection
         services.AddScoped<ITelegramService, TelegramService>();
         services.AddScoped<IStripeService, StripeService>();
 
-        services.AddHttpClient("telegram");
+        services.AddHttpClient(TelegramService.HttpClientName);
         services.AddHttpClient("stripe", (serviceProvider, client) =>
         {
             StripeConfig stripeConfig = serviceProvider
@@ -99,32 +94,6 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection ConfigureRateLimiter(this IServiceCollection services)
-    {
-        services.AddRateLimiter(options =>
-        {
-            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-            options.AddPolicy(PolicyRateLimiter.BidPolicy, httpContext =>
-            {
-                string partitionKey = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
-                                   ?? httpContext.Connection.RemoteIpAddress?.ToString()
-                                   ?? "unknown";
-
-                return RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: partitionKey,
-                    factory: partition => new FixedWindowRateLimiterOptions
-                    {
-                        AutoReplenishment = true,
-                        PermitLimit = 5, 
-                        Window = TimeSpan.FromSeconds(1)
-                    });
-            });
-        });
-
-        return services;
-    }
-
     public static IServiceCollection AddSignalR_WithRedisBackplane(this IServiceCollection services, IConfiguration configuration)
     {
         string? redisConnectionString = configuration.GetConnectionString("RedisConnection");
@@ -134,6 +103,8 @@ public static class DependencyInjection
             throw new Exception("ALERTA: A Connection String 'RedisConnection' não foi encontrada no appsettings.json!");
         }
 
+        // Registered as singleton so the partitioned rate limiter state is shared across invocations
+        services.AddSingleton<RateLimitingHubFilter>();
         services.AddSignalR(options => options.AddFilter<RateLimitingHubFilter>()).AddStackExchangeRedis(redisConnectionString);
 
         return services;
@@ -219,14 +190,8 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
-        {
+    {
         services.AddAuthorization();
-
-        services.AddScoped<PermissionProvider>();
-
-        services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
-
-        services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
         return services;
     }

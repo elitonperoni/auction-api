@@ -1,6 +1,4 @@
 using System.Reflection;
-using Amazon;
-using Amazon.Runtime;
 using Application;
 using AuctionApi;
 using AuctionApi.Extensions;
@@ -9,8 +7,6 @@ using AuctionApi.Infrastructure;
 using HealthChecks.UI.Client;
 using Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Wolverine;
-using Wolverine.AmazonSqs;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -35,8 +31,6 @@ builder.Services.AddCaching(builder.Configuration);
 
 builder.AddWolverine(builder.Configuration);
 
-builder.Services.ConfigureRateLimiter();
-
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 builder.Services.AddSignalR_WithRedisBackplane(builder.Configuration);
@@ -53,6 +47,8 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
 
 
 WebApplication app = builder.Build();
+
+app.UseRequestContextLogging();
 
 app.UseExceptionHandler();
 
@@ -76,13 +72,9 @@ app.MapHealthChecks("health", new HealthCheckOptions
 
 app.UseCookiePolicy();
 
-app.UseRateLimiter();
-
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.MapControllers();
 
 app.MapEndpoints();
 
@@ -90,7 +82,6 @@ app.MapHub<AuctionHub>("/auctionHub");
 
 await app.RunAsync();
 
-// REMARK: Required for functional and integration tests to work.
 namespace AuctionApi
 {
     public partial class Program;

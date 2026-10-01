@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -25,15 +24,6 @@ public partial class UpdateEntityAuction : Migration
             table: "auctions",
             type: "uuid",
             nullable: true);
-
-        //migrationBuilder.AddColumn<uint>(
-        //    name: "xmin",
-        //    schema: "public",
-        //    table: "auctions",
-        //    type: "xid",
-        //    rowVersion: true,
-        //    nullable: false,
-        //    defaultValue: 0u);
     }
 
     /// <inheritdoc />
@@ -48,10 +38,5 @@ public partial class UpdateEntityAuction : Migration
             name: "last_bidder_id",
             schema: "public",
             table: "auctions");
-
-        //migrationBuilder.DropColumn(
-        //    name: "xmin",
-        //    schema: "public",
-        //    table: "auctions");
     }
 }
