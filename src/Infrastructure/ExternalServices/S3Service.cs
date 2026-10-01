@@ -1,7 +1,7 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Application.Common.Interfaces;
-using Domain.Configurations;
+using Application.Common.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

@@ -9,7 +9,7 @@ namespace AuctionApi.Endpoints.Users;
 internal sealed class Register : IEndpoint
 {
     public sealed record Request(string Email, string FullName, string UserName,
-        string Phone, string Location, string Country, string State, string City,
+        string Phone, string Country, string State, string City,
         string Language, string Timezone, string Password);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -24,7 +24,6 @@ internal sealed class Register : IEndpoint
                 request.FullName,
                 request.UserName,
                 request.Phone, 
-                request.Location,
                 request.Country,
                 request.State,
                 request.City,

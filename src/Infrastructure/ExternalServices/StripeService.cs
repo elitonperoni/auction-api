@@ -2,16 +2,20 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Application.Common.Interfaces;
-using Domain.Configurations;
+using Application.Common.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SharedKernel;
 
 namespace Infrastructure.ExternalServices;
 
-public sealed class StripeService(
+internal sealed partial class StripeService(
     IHttpClientFactory httpClientFactory,
-    IOptions<StripeConfig> options) : IStripeService
+    IOptions<StripeConfig> options,
+    ILogger<StripeService> logger) : IStripeService
 {
+    public const string HttpClientName = "stripe";
+
     private readonly StripeConfig _config = options.Value;
 
     public async Task<Result<StripeCheckoutResponse>> CreateSystemAccessCheckoutLinkAsync(
@@ -21,38 +25,65 @@ public sealed class StripeService(
         if (string.IsNullOrWhiteSpace(_config.SecretKey))
         {
             return Result.Failure<StripeCheckoutResponse>(
-                Error.Failure("Stripe.NotConfigured", "Chave secreta da Stripe não configurada"));
+                Error.Failure("Stripe.NotConfigured", "Stripe secret key is not configured"));
         }
 
         if (_config.SystemAccessAmount <= 0)
         {
             return Result.Failure<StripeCheckoutResponse>(
-                Error.Failure("Stripe.InvalidSystemAccessAmount", "Valor do acesso ao sistema não configurado"));
+                Error.Failure("Stripe.InvalidSystemAccessAmount", "System access amount is not configured"));
         }
 
         if (string.IsNullOrWhiteSpace(_config.SuccessUrl))
         {
             return Result.Failure<StripeCheckoutResponse>(
-                Error.Failure("Stripe.SuccessUrlNotConfigured", "URL de sucesso da Stripe não configurada"));
+                Error.Failure("Stripe.SuccessUrlNotConfigured", "Stripe success URL is not configured"));
         }
 
-        using HttpClient httpClient = httpClientFactory.CreateClient("stripe");
-        httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", _config.SecretKey);
+        try
+        {
+            return await CreateCheckoutSessionAsync(request, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            LogRequestException(logger, ex, request.UserId);
+            return Result.Failure<StripeCheckoutResponse>(CheckoutUnavailable);
+        }
+        catch (JsonException ex)
+        {
+            LogInvalidResponse(logger, ex, request.UserId);
+            return Result.Failure<StripeCheckoutResponse>(CheckoutUnavailable);
+        }
+    }
 
-        using var formContent = new FormUrlEncodedContent(CreateCheckoutSessionPayload(request));
+    private static Error CheckoutUnavailable => Error.Failure(
+        "Stripe.CreateCheckoutSessionFailed",
+        "Could not create the checkout session. Please try again later.");
 
-        HttpResponseMessage response = await httpClient.PostAsync(
-            "checkout/sessions",
-            formContent,
-            cancellationToken);
+    private async Task<Result<StripeCheckoutResponse>> CreateCheckoutSessionAsync(
+        StripeSystemAccessCheckoutRequest request,
+        CancellationToken cancellationToken)
+    {
+        using HttpClient httpClient = httpClientFactory.CreateClient(HttpClientName);
+
+        using var message = new HttpRequestMessage(HttpMethod.Post, "checkout/sessions")
+        {
+            Content = new FormUrlEncodedContent(CreateCheckoutSessionPayload(request))
+        };
+
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.SecretKey);
+        // Retrying a registration for the same user never creates a second checkout session.
+        message.Headers.Add("Idempotency-Key", $"system-access-{request.UserId:N}");
+
+        using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
 
         string content = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
-            return Result.Failure<StripeCheckoutResponse>(
-                Error.Failure("Stripe.CreateCheckoutSessionFailed", content));
+            // Stripe's error body stays in the logs; clients only get a generic message.
+            LogCheckoutFailed(logger, request.UserId, (int)response.StatusCode, content);
+            return Result.Failure<StripeCheckoutResponse>(CheckoutUnavailable);
         }
 
         StripeCheckoutResponse? checkoutResponse = ParseCheckoutResponse(content);
@@ -60,7 +91,7 @@ public sealed class StripeService(
         if (checkoutResponse is null || string.IsNullOrWhiteSpace(checkoutResponse.CheckoutUrl))
         {
             return Result.Failure<StripeCheckoutResponse>(
-                Error.Failure("Stripe.CheckoutUrlNotFound", "Stripe não retornou a URL do checkout"));
+                Error.Failure("Stripe.CheckoutUrlNotFound", "Stripe did not return the checkout URL"));
         }
 
         return Result.Success(checkoutResponse);
@@ -126,4 +157,13 @@ public sealed class StripeService(
             ? value.GetString()
             : null;
     }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Stripe checkout session creation failed for user {UserId} with status {StatusCode}: {Body}")]
+    private static partial void LogCheckoutFailed(ILogger logger, Guid userId, int statusCode, string body);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Stripe request failed for user {UserId}")]
+    private static partial void LogRequestException(ILogger logger, Exception exception, Guid userId);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Stripe returned an unreadable response for user {UserId}")]
+    private static partial void LogInvalidResponse(ILogger logger, Exception exception, Guid userId);
 }

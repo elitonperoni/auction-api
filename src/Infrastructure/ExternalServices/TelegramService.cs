@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Net.Http.Json;
 using Application.Common.Interfaces;
-using Domain.Configurations;
+using Application.Common.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

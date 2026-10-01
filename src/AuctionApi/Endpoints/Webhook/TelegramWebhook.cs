@@ -2,7 +2,7 @@
 using Application.Features.Notifications.Command.TelegramNotification;
 using System.Security.Cryptography;
 using System.Text;
-using Domain.Configurations;
+using Application.Common.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 

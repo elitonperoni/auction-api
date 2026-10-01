@@ -4,8 +4,7 @@ using Application.Common.Abstractions.Authentication;
 using Application.Common.Abstractions.Data;
 using Application.Common.Abstractions.Mail;
 using Application.Common.Interfaces;
-using Application.Common.Mail;
-using Domain.Configurations;
+using Application.Common.Options;
 using Infrastructure.Authentication;
 using Infrastructure.Caching;
 using Infrastructure.Database;
@@ -65,7 +64,7 @@ public static class DependencyInjection
         services.AddScoped<IStripeService, StripeService>();
 
         services.AddHttpClient(TelegramService.HttpClientName);
-        services.AddHttpClient("stripe", (serviceProvider, client) =>
+        services.AddHttpClient(StripeService.HttpClientName, (serviceProvider, client) =>
         {
             StripeConfig stripeConfig = serviceProvider
                 .GetRequiredService<Microsoft.Extensions.Options.IOptions<StripeConfig>>()

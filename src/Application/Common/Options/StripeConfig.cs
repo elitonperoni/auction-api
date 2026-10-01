@@ -1,4 +1,4 @@
-namespace Domain.Configurations;
+namespace Application.Common.Options;
 
 public sealed class StripeConfig
 {

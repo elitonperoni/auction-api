@@ -1,9 +1,9 @@
-﻿using Application.Common.Abstractions.Data;
+using Application.Common.Abstractions.Data;
 using Application.Common.Abstractions.Mail;
 using Application.Common.Abstractions.Messaging;
 using Application.Common.Extensions;
 using Application.Common.Mail;
-using Domain.Configurations;
+using Application.Common.Options;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -33,32 +33,30 @@ internal sealed class SendRecoveryPasswordRequestCommandHandler(
 
         await context.SaveChangesAsync(cancellationToken);
 
-        await SendEmailRecoveryPassword(token, user.Email, user.UserName);
+        await SendEmailRecoveryPassword(token, user.Email, user.UserName, cancellationToken);
 
         return true;
     }
 
-    private async Task SendEmailRecoveryPassword(string token, string email, string userName)
+    private async Task SendEmailRecoveryPassword(string token, string email, string userName, CancellationToken cancellationToken)
     {
         string linkUrl = $"{options.Value.WebUrl}reset-password?id={token}";
 
         string htmlBody = $@"
         <html>
             <body>
-                <p>Olá {userName}!</p>
-                <p>Para redefinir sua senha, clique no link abaixo:</p>
+                <p>Hello {userName}!</p>
+                <p>To reset your password, click the link below:</p>
                 <p>
-                    <a href='{linkUrl}' target='_blank'>Redefinir minha senha</a>
+                    <a href='{linkUrl}' target='_blank'>Reset my password</a>
                 </p>
-                <p>Ou copie e cole o link abaixo no seu navegador:</p>
+                <p>Or copy and paste this link into your browser:</p>
                 <p>{linkUrl}</p>
             </body>
         </html>";
 
-        await mailSender.SendEmail(new SendEmailCommand(
-            "Redefinicação de senha - Leilão Max",
-            htmlBody,
-            email
-            ), options);
+        await mailSender.SendEmailAsync(
+            new SendEmailCommand("Password reset", htmlBody, email),
+            cancellationToken);
     }
 }

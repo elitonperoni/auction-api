@@ -1,7 +1,7 @@
 ﻿using Application.Common.Abstractions.Authentication;
 using Application.Common.Abstractions.Messaging;
 using Application.Common.Interfaces;
-using Domain.Configurations;
+using Application.Common.Options;
 using Microsoft.Extensions.Options;
 using SharedKernel;
 

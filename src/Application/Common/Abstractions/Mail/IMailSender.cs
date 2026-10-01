@@ -1,10 +1,8 @@
-﻿using Application.Common.Mail;
-using Domain.Configurations;
-using Microsoft.Extensions.Options;
+using Application.Common.Mail;
 
 namespace Application.Common.Abstractions.Mail;
 
 public interface IMailSender
 {
-    Task SendEmail(SendEmailCommand requestEmail, IOptions<SecretsApi> options);
+    Task SendEmailAsync(SendEmailCommand email, CancellationToken cancellationToken = default);
 }
