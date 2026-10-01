@@ -1,4 +1,6 @@
-﻿namespace AuctionApi.Endpoints.Users;
+﻿using SharedKernel.Consts;
+
+namespace AuctionApi.Endpoints.Users;
 
 internal sealed class Logout : IEndpoint
 {
@@ -12,8 +14,8 @@ internal sealed class Logout : IEndpoint
                 Path = "/"
             };
 
-            context.Response.Cookies.Append("auth-token", "", cookieOptions);
-            context.Response.Cookies.Append("refresh-token", "", cookieOptions);
+            context.Response.Cookies.Append(TokenConsts.AuthToken, "", cookieOptions);
+            context.Response.Cookies.Append(TokenConsts.RefreshToken, "", cookieOptions);
 
             return Results.NoContent();
         })

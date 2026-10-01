@@ -6,7 +6,7 @@ using SharedKernel;
 
 namespace AuctionApi.Endpoints.AuctionBid;
 
-public class ListByUserId : IEndpoint
+internal sealed class ListByUserId : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

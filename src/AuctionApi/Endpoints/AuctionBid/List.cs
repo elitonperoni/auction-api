@@ -7,9 +7,9 @@ using SharedKernel;
 
 namespace AuctionApi.Endpoints.AuctionBid;
 
-public class List : IEndpoint
+internal sealed class List : IEndpoint
 {    
-    public record Request : PaginationParams
+    public sealed record Request : PaginationParams
     {
         public string? SearchTerm { get; set; }
     }

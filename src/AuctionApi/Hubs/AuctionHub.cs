@@ -15,23 +15,25 @@ public class AuctionHub(
     IMessageBus bus,
     IQueryHandler<GetDetailProductQuery, GetDetailProductResponse> getDetailHandler) : Hub
 {
+    public const string Route = "/auctionHub";
+
     public async Task SendBid(string groupName, string bidValueString)
     {
         if (!Guid.TryParse(Context.User?.FindFirstValue(ClaimTypes.NameIdentifier), out Guid userId))
         {
-            await Clients.Caller.SendAsync(ChannelNames.BidError, "Usuário não autenticado.");
+            await Clients.Caller.SendAsync(ChannelNames.BidError, "User is not authenticated.");
             return;
         }
 
         if (!Guid.TryParse(groupName, out Guid auctionId))
         {
-            await Clients.Caller.SendAsync(ChannelNames.BidError, "Leilão inválido.");
+            await Clients.Caller.SendAsync(ChannelNames.BidError, "Invalid auction.");
             return;
         }
 
         if (!decimal.TryParse(bidValueString, out decimal bidAmount))
         {
-            await Clients.Caller.SendAsync(ChannelNames.BidError, "Valor do lance inválido.");
+            await Clients.Caller.SendAsync(ChannelNames.BidError, "Invalid bid amount.");
             return;
         }
 
@@ -47,7 +49,7 @@ public class AuctionHub(
     public async Task JoinAuctionGroup(string groupName)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        await Clients.Caller.SendAsync(ChannelNames.ReceiveMessage, nameof(AuctionHub), $"Você entrou no leilão: {groupName}");
+        await Clients.Caller.SendAsync(ChannelNames.ReceiveMessage, nameof(AuctionHub), $"You joined the auction: {groupName}");
     }
 
     public async Task JoinUserGroup(string groupName)

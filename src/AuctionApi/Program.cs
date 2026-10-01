@@ -35,16 +35,16 @@ builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 builder.Services.AddSignalR_WithRedisBackplane(builder.Configuration);
 
-string[] allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+const string corsPolicyName = "CorsPolicy";
 
-builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
+string[] allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? [];
+
+builder.Services.AddCors(options => options.AddPolicy(corsPolicyName,
     policy => policy
-        .WithOrigins(allowedOrigins ?? [])
+        .WithOrigins(allowedOrigins)
         .AllowAnyHeader()
         .AllowAnyMethod()
-        .AllowCredentials() 
-));
-
+        .AllowCredentials()));
 
 WebApplication app = builder.Build();
 
@@ -56,7 +56,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseCors("CorsPolicy");
+app.UseCors(corsPolicyName);
 
 app.UseSwaggerWithUi();
 
@@ -78,7 +78,7 @@ app.UseAuthorization();
 
 app.MapEndpoints();
 
-app.MapHub<AuctionHub>("/auctionHub");
+app.MapHub<AuctionHub>(AuctionHub.Route);
 
 await app.RunAsync();
 

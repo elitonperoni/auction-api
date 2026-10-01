@@ -1,4 +1,4 @@
-﻿using Application.Features.Users.Command.Update;
+﻿using Application.Features.Users.Commands.Update;
 using Domain.Entities;
 
 namespace Application.Common.Extensions.Entities;

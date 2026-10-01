@@ -17,6 +17,10 @@ internal sealed class AuctionListByUserIdHandler(
     IS3Service s3Service)
     : IQueryHandler<AuctionListByUserIdQuery, List<AuctionListByUserIdResponse>>
 {
+    // API contract: the web client matches on these exact values, change them together with the frontend.
+    private const string ActiveStatus = "Ativo";
+    private const string FinishedStatus = "Finalizado";
+
     public async Task<Result<List<AuctionListByUserIdResponse>>> Handle(AuctionListByUserIdQuery query, CancellationToken cancellationToken)
     {
         List<Auction> auctionsByUserId = await GetAuctionsByUserId(cancellationToken);
@@ -32,7 +36,7 @@ internal sealed class AuctionListByUserIdHandler(
             ? s3Service.BuildPublicUri($"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{p.Id}/{p.Photos?.FirstOrDefault()?.Name}").ToString()
             : "",
             ActualWinner = !string.IsNullOrEmpty(p.LastBidder?.UserName) ? $"@{p.LastBidder?.UserName}" : null,
-            Status = p.EndDate > DateTime.UtcNow ? "Ativo" : "Finalizado"
+            Status = p.EndDate > DateTime.UtcNow ? ActiveStatus : FinishedStatus
         }).ToList();
 
         return response;

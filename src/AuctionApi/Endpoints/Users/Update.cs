@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Users.Command.Update;
+using Application.Features.Users.Commands.Update;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Notifications.Command.MarkAsReadById;
+using Application.Features.Notifications.Commands.MarkAsReadById;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +7,7 @@ using SharedKernel;
 
 namespace AuctionApi.Endpoints.Notifications;
 
-public class MarkNotificationAsRead : IEndpoint
+internal sealed class MarkNotificationAsRead : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

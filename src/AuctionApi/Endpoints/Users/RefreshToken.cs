@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Users.Command.RefreshToken;
+using Application.Features.Users.Commands.RefreshToken;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;
@@ -7,10 +7,8 @@ using SharedKernel.Consts;
 
 namespace AuctionApi.Endpoints.Users;
 
-public class RefreshToken : IEndpoint
+internal sealed class RefreshToken : IEndpoint
 {
-    public sealed record Request(string Token, string RefreshToken);
-
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("users/refresh-token", async (
@@ -42,7 +40,7 @@ public class RefreshToken : IEndpoint
                  context.Response.Cookies.Append(TokenConsts.AuthToken, response.Token, cookieOptions);
                  context.Response.Cookies.Append(TokenConsts.RefreshToken, response.RefreshToken, cookieOptions);
 
-                 return Results.Ok(new { message = "Tokens atualizados com sucesso" });
+                 return Results.Ok(new { message = "Tokens refreshed successfully" });
              },
              error => CustomResults.Problem(error)
          );

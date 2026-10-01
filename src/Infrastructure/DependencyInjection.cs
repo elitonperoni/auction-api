@@ -81,7 +81,7 @@ public static class DependencyInjection
 
         if (string.IsNullOrEmpty(redisConnectionString))
         {
-            throw new Exception("ALERTA: A Connection String 'RedisConnection' não foi encontrada no appsettings.json!");
+            throw new InvalidOperationException("The 'RedisConnection' connection string is not configured.");
         }
        
         services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -99,7 +99,7 @@ public static class DependencyInjection
 
         if (string.IsNullOrEmpty(redisConnectionString))
         {
-            throw new Exception("ALERTA: A Connection String 'RedisConnection' não foi encontrada no appsettings.json!");
+            throw new InvalidOperationException("The 'RedisConnection' connection string is not configured.");
         }
 
         // Registered as singleton so the partitioned rate limiter state is shared across invocations

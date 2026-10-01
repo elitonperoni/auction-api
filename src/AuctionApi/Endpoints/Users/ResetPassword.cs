@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Users.Command.ResetPassword;
+using Application.Features.Users.Commands.ResetPassword;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Notifications.Command.TelegramNotification;
+using Application.Features.Notifications.Commands.TelegramNotification;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Common.Options;

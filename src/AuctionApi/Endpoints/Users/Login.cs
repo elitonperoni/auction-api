@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Users.Command.Login;
+using Application.Features.Users.Commands.Login;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

@@ -40,7 +40,7 @@ public class CacheService(IConnectionMultiplexer redis, IUserContext userContext
             .ToList();
     }
 
-    public async Task MarkNoficationAsRead(Guid? notificationId = null)
+    public async Task MarkNotificationAsRead(Guid? notificationId = null)
     {
         Guid userId = userContext.UserId;
 

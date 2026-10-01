@@ -7,7 +7,7 @@ using SharedKernel;
 
 namespace AuctionApi.Endpoints.AuctionBid;
 
-public class Create : IEndpoint
+internal sealed class Create : IEndpoint
 {
     public sealed class Request
     {

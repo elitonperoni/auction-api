@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Users.Command.SendUserMessageTelegram.cs;
+using Application.Features.Users.Commands.SendUserMessageTelegram;
 using AuctionApi.Hubs;
 using Domain.Events;
 using Infrastructure;
@@ -19,7 +19,7 @@ public class BidProcessedHandler(
                 msg.TotalAmount,
                 msg.TotalBids,
                 msg.LastBidderId,
-                msg.LastBidderNamer,
+                msg.LastBidderName,
                 DateTime.UtcNow,
                 cancellationToken);
 

@@ -40,7 +40,7 @@ public class BidPlacedHandler(
             responseBid.Value.Amount,
             responseBid.Value.TotalBids,
             responseBid.Value.LastBidderId,
-            responseBid.Value.LastBidderNamer,
+            responseBid.Value.LastBidderName,
             responseBid.Value.AuctionOwnerId,
             responseBid.Value.MessageToOwner,
             responseBid.Value.DescriptionDetail,

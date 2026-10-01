@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Users.Command.SendRecoveryPassword;
+using Application.Features.Users.Commands.SendRecoveryPassword;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

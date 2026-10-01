@@ -5,7 +5,7 @@ public record BidProcessedEvent(
     decimal TotalAmount, 
     int TotalBids, 
     Guid LastBidderId, 
-    string LastBidderNamer, 
+    string LastBidderName, 
     Guid AuctionOwnerId,
     string MessageToOwner,
     string DescriptionDetail,

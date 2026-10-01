@@ -8,5 +8,5 @@ public interface ICacheService
     Task<Guid?> ConsumeLinkTokenTelegram(string token);
     Task<string> GenerateLinkTokenTelegram(Guid userId);
     Task<List<NotificationItem>> GetNotificationsAsync(Guid userId);
-    Task MarkNoficationAsRead(Guid? notificationId = null);
+    Task MarkNotificationAsRead(Guid? notificationId = null);
 }

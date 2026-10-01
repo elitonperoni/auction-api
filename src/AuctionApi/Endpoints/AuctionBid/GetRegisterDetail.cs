@@ -1,5 +1,5 @@
 ﻿using Application.Common.Abstractions.Messaging;
-using Application.Features.Auctions.Commands.Update;
+using Application.Features.Auctions.Queries.GetRegisterDetail;
 using AuctionApi.Extensions;
 using AuctionApi.Infrastructure;
 using SharedKernel;

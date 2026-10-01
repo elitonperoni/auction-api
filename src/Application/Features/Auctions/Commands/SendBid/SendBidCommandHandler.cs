@@ -29,19 +29,19 @@ public class SendBidCommandHandler(
             if (auction is null)
             {
                 return Result.Failure<SendBidDtoResponse>(
-                    Error.Failure("Bid.Invalid", $"Produto não encontrado"));
+                    Error.Failure("Bid.Invalid", "Auction not found"));
             }
 
             if (auction.EndDate < DateTime.UtcNow)
             {
                 return Result.Failure<SendBidDtoResponse>(
-                    Error.Failure("Bid.Invalid", $"Leilão encerrado"));
+                    Error.Failure("Bid.Invalid", "Auction has ended"));
             }
 
             if (command.BidPrice <= auction.CurrentPrice)
             {
                 return Result.Failure<SendBidDtoResponse>(
-                    Error.Failure("Bid.Invalid", $"O lance de {command.BidPrice:C} é inferior ao atual {auction.CurrentPrice:C}"));
+                    Error.Failure("Bid.Invalid", $"The bid of {command.BidPrice:C} is not higher than the current price of {auction.CurrentPrice:C}"));
             }
 
             Bid auctionBid = new()
@@ -63,14 +63,14 @@ public class SendBidCommandHandler(
 
             User? user = await context.Users.AsNoTracking().SingleOrDefaultAsync(p => p.Id == command.UserId, cancellationToken);
 
-            string messageToOwner = $"Você recebeu um novo lance no item {auction.Title}";
+            string messageToOwner = $"You received a new bid on {auction.Title}";
             string descriptionDetail = $"{messageToOwner} | @{user?.UserName} | R${auctionBid.Amount}";
             
             return Result.Success(new SendBidDtoResponse
             {
                 AuctionId = auctionBid.AuctionId,
                 LastBidderId = command.UserId,
-                LastBidderNamer = user?.UserName ?? "",
+                LastBidderName = user?.UserName ?? "",
                 TotalBids = auction.BidCount,
                 AuctionOwnerId = auction.UserId,
                 MessageToOwner = messageToOwner,

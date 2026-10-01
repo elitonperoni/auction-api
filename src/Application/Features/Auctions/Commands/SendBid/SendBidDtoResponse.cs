@@ -5,7 +5,7 @@ public sealed class SendBidDtoResponse
     public Guid AuctionId { get; set; }
     public int TotalBids { get; set; }
     public Guid LastBidderId { get; set; }
-    public string LastBidderNamer { get; set; }
+    public string LastBidderName { get; set; }
     public Guid AuctionOwnerId { get; set; }
     public string MessageToOwner { get; set; }
     public string DescriptionDetail { get; set; }
