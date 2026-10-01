@@ -6,8 +6,8 @@
     <ProjectGuid>34bb3069-d5d0-4046-acad-a2025ed7678f</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>AuctionApi</DockerServiceName>
-    <DockerComposeProjectName>clean-architecture</DockerComposeProjectName>
+    <DockerServiceName>web-api</DockerServiceName>
+    <DockerComposeProjectName>auction</DockerComposeProjectName>
     <UserSecretsId>64eb63ef-eeee-41b4-a6cd-04ce21f1110f</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>

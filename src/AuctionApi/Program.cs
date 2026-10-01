@@ -64,7 +64,10 @@ app.UseCors("CorsPolicy");
 
 app.UseSwaggerWithUi();
 
-app.ApplyMigrations();
+if (app.Environment.IsDevelopment())
+{
+    app.ApplyMigrations();
+}
 
 app.MapHealthChecks("health", new HealthCheckOptions
 {
