@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
+using NotificationTypeEnum = SharedKernel.Enum.NotificationType;
 
 namespace Application.Features.Users.Command.LinkTelegramChatIdAccount;
 
@@ -23,7 +24,7 @@ internal sealed class LinkTelegramAccountHandler(IApplicationDbContext context) 
         UserNotification? userNotification = new()
         {
             UserId = user.Id,
-            NotificationTypeId = 1
+            NotificationTypeId = (int)NotificationTypeEnum.Telegram
         };
 
         user.Raise(new UserLinkTelegramDomainEvent(command.ChatId));

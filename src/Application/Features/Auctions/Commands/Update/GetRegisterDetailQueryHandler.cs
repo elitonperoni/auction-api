@@ -1,6 +1,7 @@
 ﻿using Application.Common.Abstractions.Data;
 using Application.Common.Abstractions.Messaging;
 using Application.Common.Interfaces;
+using Domain.Auctions;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -23,7 +24,7 @@ internal sealed class GetRegisterDetailQueryHandler(
 
         if (auctionDb is null)
         {
-            return new GetRegisterDetailResponse();
+            return Result.Failure<GetRegisterDetailResponse>(AuctionErrors.NotFound(query.Id));
         }
 
         List<string> photosUrls = [];

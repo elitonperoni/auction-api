@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Application.Common.Abstractions.Data;
+﻿using Application.Common.Abstractions.Data;
 using Application.Common.Abstractions.Messaging;
 using Application.Common.Enums;
 using Application.Common.Extensions;
@@ -18,7 +17,7 @@ internal sealed class AutionListQueryHandler(
 {
     public async Task<Result<PagedResult<AuctionListResponse>>> Handle(AuctionListQuery query, CancellationToken cancellationToken)
     {
-        Pagination<Auction> auctionPagedList = await ApplyFilter(query);
+        Pagination<Auction> auctionPagedList = await ApplyFilter(query, cancellationToken);
         PaginationMetadata metaDataAuction = auctionPagedList.GetMetadata();
 
         var response = auctionPagedList.Select(p => new AuctionListResponse()
@@ -37,7 +36,7 @@ internal sealed class AutionListQueryHandler(
         
         return new PagedResult<AuctionListResponse>(response, metaDataAuction);        
     }
-    private async Task<Pagination<Auction>> ApplyFilter(AuctionListQuery query)
+    private async Task<Pagination<Auction>> ApplyFilter(AuctionListQuery query, CancellationToken cancellationToken)
     {
         IQueryable<Auction> auctionQuery = context.Auctions
                     .Where(p => p.EndDate >= DateTime.UtcNow)
@@ -48,17 +47,19 @@ internal sealed class AutionListQueryHandler(
 
         if (!string.IsNullOrEmpty(query.SearchTerm))
         {
-            string searchTerm = $"%{query.SearchTerm.ToLower(CultureInfo.CurrentCulture)}%";
+            string searchTerm = $"%{query.SearchTerm.ToUpperInvariant()}%";
 
-            auctionQuery = auctionQuery.Where(p => p.ProductDetail != null && (EF.Functions.Like(p.Title.ToLower(CultureInfo.CurrentCulture), searchTerm)
-            || EF.Functions.Like(p.ProductDetail.Description.ToLower(CultureInfo.CurrentCulture), searchTerm)));
+            auctionQuery = auctionQuery.Where(p => p.ProductDetail != null &&
+                (EF.Functions.Like(p.Title.ToUpperInvariant(), searchTerm)
+                || EF.Functions.Like(p.ProductDetail.Description.ToUpperInvariant(), searchTerm)));
         }
 
         auctionQuery = auctionQuery.OrderBy(p => p.EndDate);
 
         Pagination<Auction> pagedAuctions = await PagedList<Auction>.ToPagedList(auctionQuery,
              query.PageIndex,
-             query.PageSize);       
+             query.PageSize,
+             cancellationToken);       
 
         return pagedAuctions;
     }

@@ -3,6 +3,7 @@ using Application.Common.Abstractions.Data;
 using Application.Common.Abstractions.Messaging;
 using Application.Common.Extensions.Entities;
 using Application.Common.Interfaces;
+using Domain.Auctions;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -32,7 +33,7 @@ internal sealed class GetDetailProductQueryHandler(
 
         if (auctionDb is null)
         {
-            return new GetDetailProductResponse();
+            return Result.Failure<GetDetailProductResponse>(AuctionErrors.NotFound(query.Id));
         }    
 
         List<Bid> bids = await context.Bids

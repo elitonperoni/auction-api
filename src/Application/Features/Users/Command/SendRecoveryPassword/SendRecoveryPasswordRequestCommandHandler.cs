@@ -5,7 +5,6 @@ using Application.Common.Extensions;
 using Application.Common.Mail;
 using Domain.Configurations;
 using Domain.Entities;
-using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SharedKernel;
@@ -16,25 +15,27 @@ internal sealed class SendRecoveryPasswordRequestCommandHandler(
     IApplicationDbContext context,
     IMailSender mailSender,
     IOptions<SecretsApi> options
-    ) : ICommandHandler<SendRecoveryPasswordRequestCommand, string>
+    ) : ICommandHandler<SendRecoveryPasswordRequestCommand, bool>
 {
-    public async Task<Result<string>> Handle(SendRecoveryPasswordRequestCommand command, CancellationToken cancellationToken)
+    // Always reports success so the endpoint cannot be used to discover registered emails,
+    // and never returns the reset token: it is only delivered by email.
+    public async Task<Result<bool>> Handle(SendRecoveryPasswordRequestCommand command, CancellationToken cancellationToken)
     {
-        User? usuario = await context.Users.FirstOrDefaultAsync(u => u.Email == command.email, cancellationToken);
-        if (usuario == null)
+        User? user = await context.Users.FirstOrDefaultAsync(u => u.Email == command.email, cancellationToken);
+        if (user is null)
         {
-            return Result.Failure<string>(UserErrors.Unauthorized());
+            return true;
         }
 
         string token = TokenGenerator.GenerateSecureToken();
-        usuario.ResetPasswordCode = token;
-        usuario.ResetPasswordExpiry = DateTime.UtcNow.AddHours(2);
+        user.ResetPasswordCode = token;
+        user.ResetPasswordExpiry = DateTime.UtcNow.AddHours(2);
 
         await context.SaveChangesAsync(cancellationToken);
 
-        await SendEmailRecoveryPassword(token, usuario.Email, usuario.UserName);
+        await SendEmailRecoveryPassword(token, user.Email, user.UserName);
 
-        return Result.Success(token); 
+        return true;
     }
 
     private async Task SendEmailRecoveryPassword(string token, string email, string userName)

@@ -7,4 +7,6 @@ public class SecretsApi
     public string WebUrl { get; set; }
     public string Environment { get; set; }
     public string ApiKeyTelegram { get; set; }
+    public string TelegramBotUsername { get; set; } = "auctionmax_bot";
+    public string TelegramWebhookSecret { get; set; } = string.Empty;
 }

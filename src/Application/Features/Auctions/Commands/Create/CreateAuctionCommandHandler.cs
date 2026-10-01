@@ -4,6 +4,7 @@ using Application.Common.Abstractions.Messaging;
 using Application.Common.Enums;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Domain.Auctions;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -18,15 +19,21 @@ public class CreateAuctionCommandHandler(
 {
     public async Task<Result<Guid>> Handle(CreateAuctionCommand command, CancellationToken cancellationToken)
     {        
-        Guid auctionId = command.Id.HasValue && command.Id != Guid.Empty
+        Result<Guid> result = command.Id.HasValue && command.Id != Guid.Empty
             ? await UpdateAuction(command, cancellationToken)
             : await SaveNewAuction(command, cancellationToken);
 
+        if (result.IsFailure)
+        {
+            return result;
+        }
+
         await context.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(auctionId);
+        return result;
     }
-    private async Task<Guid> SaveNewAuction(CreateAuctionCommand command, CancellationToken cancellationToken)
+
+    private async Task<Result<Guid>> SaveNewAuction(CreateAuctionCommand command, CancellationToken cancellationToken)
     {
         Guid userId = userContext.UserId;
 
@@ -55,13 +62,13 @@ public class CreateAuctionCommandHandler(
 
         if (command.NewImages.Any())
         {
-            await SavePhotos(command, auction.Id);
+            await SavePhotos(command, auction.Id, cancellationToken);
         }
 
         return auction.Id;
     }
 
-    private async Task<Guid> UpdateAuction(CreateAuctionCommand command, CancellationToken cancellationToken)
+    private async Task<Result<Guid>> UpdateAuction(CreateAuctionCommand command, CancellationToken cancellationToken)
     {
         Guid userId = userContext.UserId;
 
@@ -72,7 +79,7 @@ public class CreateAuctionCommandHandler(
 
         if (auction is null)
         {
-            return Guid.Empty;
+            return Result.Failure<Guid>(AuctionErrors.NotFound(command.Id!.Value));
         }
 
         if (auction.ProductDetail is not null)
@@ -91,12 +98,12 @@ public class CreateAuctionCommandHandler(
 
         if (command.ImagesToRemove?.Any() is true)
         {
-            await RemovePhotos(command, auction);
+            await RemovePhotos(command, auction, cancellationToken);
         }
 
         if (command.NewImages.Any())
         {
-            await SavePhotos(command, auction.Id);
+            await SavePhotos(command, auction.Id, cancellationToken);
         }
 
         context.Auctions.Update(auction);
@@ -104,7 +111,7 @@ public class CreateAuctionCommandHandler(
         return auction.Id;
     }
 
-    private async Task RemovePhotos(CreateAuctionCommand command, Auction auction)
+    private async Task RemovePhotos(CreateAuctionCommand command, Auction auction, CancellationToken cancellationToken)
     {
         if (command?.ImagesToRemove is null || !command.ImagesToRemove.Any())
         {
@@ -121,12 +128,12 @@ public class CreateAuctionCommandHandler(
             if (photoEntity is not null)
             {
                 auction.Photos?.Remove(photoEntity);
-                await s3Service.DeleteFile(photoEntity.Name);
+                await s3Service.DeleteFile(photoEntity.Name, cancellationToken);
             }
         }
     }
 
-    private async Task SavePhotos(CreateAuctionCommand command, Guid auctionId)
+    private async Task SavePhotos(CreateAuctionCommand command, Guid auctionId, CancellationToken cancellationToken)
     {
         if (command.NewImages.Any())
         {
@@ -147,7 +154,7 @@ public class CreateAuctionCommandHandler(
 
                 await s3Service.UploadImageAsync(item.Stream,
                     $"{AWSS3Folder.AuctionProductPhotos.GetDescription()}/{auctionId}",
-                    fileName, contentType);
+                    fileName, contentType, cancellationToken);
             }
 
             context.ProductPhotos.AddRange(newImages);

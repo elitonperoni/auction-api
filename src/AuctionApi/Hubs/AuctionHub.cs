@@ -65,7 +65,7 @@ public class AuctionHub(
         Result<GetDetailProductResponse> result =
             await getDetailHandler.Handle(new GetDetailProductQuery(id), Context.ConnectionAborted);
 
-        if (result.IsFailure || result.Value.Id == Guid.Empty)
+        if (result.IsFailure)
         {
             return;
         }

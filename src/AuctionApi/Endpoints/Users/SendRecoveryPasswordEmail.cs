@@ -14,12 +14,12 @@ internal sealed class SendRecoveryPasswordEmail : IEndpoint
     {
         app.MapPost("users/send-recovery-password-email", async (
             Request request,
-            ICommandHandler<SendRecoveryPasswordRequestCommand, string> handler,
+            ICommandHandler<SendRecoveryPasswordRequestCommand, bool> handler,
             CancellationToken cancellationToken) =>
         {
             var command = new SendRecoveryPasswordRequestCommand(request.Email);
 
-            Result<string> result = await handler.Handle(command, cancellationToken);
+            Result<bool> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })

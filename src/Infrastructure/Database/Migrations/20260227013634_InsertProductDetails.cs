@@ -49,7 +49,6 @@ public partial class InsertProductDetails : Migration
             {(int)ConditionProduct.USED},
             {(int)ConditionProduct.INCOMPLETE},
             {(int)ConditionProduct.SALVAGE}
-        ");
-
+        )");
     }
 }
